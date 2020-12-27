@@ -107,12 +107,22 @@ fn get_lines(filename: &str) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn part1() {
+    fn part1_test_input() {
         assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input"), 3);
     }
 
     #[test]
-    fn part2() {
+    fn part1_real_input() {
+        assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input"), 393);
+    }
+
+    #[test]
+    fn part2_test_input() {
         assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input"), 2);
+    }
+
+    #[test]
+    fn part2_real_input() {
+        assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input"), 690);
     }
 }

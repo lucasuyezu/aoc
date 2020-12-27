@@ -77,12 +77,22 @@ fn get_numbers(filename: &str) -> Vec<usize> {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn part1() {
+    fn part1_test_input() {
         assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"), 514579);
     }
 
     #[test]
-    fn part2() {
+    fn part1_real_input() {
+        assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"), 1014171);
+    }
+
+    #[test]
+    fn part2_test_input() {
         assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"), 241861950);
+    }
+
+    #[test]
+    fn part2_real_input() {
+        assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"), 46584630);
     }
 }
