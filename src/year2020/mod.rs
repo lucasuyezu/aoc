@@ -4,6 +4,7 @@ use std::fs::File;
 
 pub mod day1;
 pub mod day2;
+pub mod day3;
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
