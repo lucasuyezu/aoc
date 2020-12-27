@@ -46,9 +46,7 @@ pub fn solve_part_2(numbers: &[usize]) -> usize {
 }
 
 pub fn get_structs(lines_iter: std::slice::Iter<String>) -> Vec<usize> {
-    let numbers: Vec<usize> = lines_iter
-        .map(|it| it.parse::<usize>().unwrap())
-        .collect();
+    let numbers: Vec<usize> = lines_iter.map(|it| it.parse::<usize>().unwrap()).collect();
 
     return numbers;
 }
@@ -57,7 +55,9 @@ pub fn get_structs(lines_iter: std::slice::Iter<String>) -> Vec<usize> {
 mod tests {
     #[test]
     fn part1_test_input() {
-        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+        let lines = super::super::get_lines(
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input",
+        );
         let structs = super::get_structs(lines.iter());
 
         assert_eq!(super::solve_part_1(structs.as_slice()), 514579);
@@ -65,7 +65,9 @@ mod tests {
 
     #[test]
     fn part1_real_input() {
-        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+        let lines = super::super::get_lines(
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input",
+        );
         let structs = super::get_structs(lines.iter());
 
         assert_eq!(super::solve_part_1(structs.as_slice()), 1014171);
@@ -73,7 +75,9 @@ mod tests {
 
     #[test]
     fn part2_test_input() {
-        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+        let lines = super::super::get_lines(
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input",
+        );
         let structs = super::get_structs(lines.iter());
 
         assert_eq!(super::solve_part_2(structs.as_slice()), 241861950);
@@ -81,7 +85,9 @@ mod tests {
 
     #[test]
     fn part2_real_input() {
-        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+        let lines = super::super::get_lines(
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input",
+        );
         let structs = super::get_structs(lines.iter());
 
         assert_eq!(super::solve_part_2(structs.as_slice()), 46584630);

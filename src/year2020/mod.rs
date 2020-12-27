@@ -1,6 +1,6 @@
-use std::path::Path;
-use std::io::{self, BufRead};
 use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
 
 pub mod day1;
 pub mod day2;
