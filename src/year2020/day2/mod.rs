@@ -1,5 +1,5 @@
 #[derive(Debug)]
-struct LoginPolicy {
+pub struct LoginPolicy {
     min: usize,
     max: usize,
     req_char: char,
@@ -22,25 +22,21 @@ impl LoginPolicy {
     }
 }
 
-pub fn solve_part_1(lines_iter: std::slice::Iter<String>) -> usize {
-    let valid_login_policies: Vec<LoginPolicy> = login_policies(lines_iter)
-        .into_iter()
+pub fn solve_part_1(numbers: &[LoginPolicy]) -> usize {
+    return numbers
+        .iter()
         .filter(|it| it.is_valid_part_1())
-        .collect();
-
-    return valid_login_policies.len();
+        .count();
 }
 
-pub fn solve_part_2(lines_iter: std::slice::Iter<String>) -> usize {
-    let valid_login_policies: Vec<LoginPolicy> = login_policies(lines_iter)
-        .into_iter()
+pub fn solve_part_2(numbers: &[LoginPolicy]) -> usize {
+    return numbers
+        .iter()
         .filter(|it| it.is_valid_part_2())
-        .collect();
-
-    return valid_login_policies.len();
+        .count();
 }
 
-fn login_policies(lines_iter: std::slice::Iter<String>) -> Vec<LoginPolicy> {
+pub fn get_structs(lines_iter: std::slice::Iter<String>) -> Vec<LoginPolicy> {
     let mut login_policies: Vec<LoginPolicy> = Vec::new();
 
     // Build login structs
@@ -80,28 +76,32 @@ mod tests {
     #[test]
     fn part1_test_input() {
         let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_1(lines.iter()), 3);
+        assert_eq!(super::solve_part_1(structs.as_slice()), 3);
     }
 
     #[test]
     fn part1_real_input() {
         let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_1(lines.iter()), 393);
+        assert_eq!(super::solve_part_1(structs.as_slice()), 393);
     }
 
     #[test]
     fn part2_test_input() {
         let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_2(lines.iter()), 2);
+        assert_eq!(super::solve_part_2(structs.as_slice()), 2);
     }
 
     #[test]
     fn part2_real_input() {
         let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_2(lines.iter()), 690);
+        assert_eq!(super::solve_part_2(structs.as_slice()), 690);
     }
 }

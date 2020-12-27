@@ -1,5 +1,4 @@
-pub fn solve_part_1(lines_iter: std::slice::Iter<String>) -> usize {
-    let numbers = get_numbers(lines_iter);
+pub fn solve_part_1(numbers: &[usize]) -> usize {
     let mut i = 0;
     let mut j = 1;
 
@@ -18,8 +17,7 @@ pub fn solve_part_1(lines_iter: std::slice::Iter<String>) -> usize {
     return 0;
 }
 
-pub fn solve_part_2(lines_iter: std::slice::Iter<String>) -> usize {
-    let numbers = get_numbers(lines_iter);
+pub fn solve_part_2(numbers: &[usize]) -> usize {
     let mut i = 0;
     let mut j = 1;
     let mut k = 2;
@@ -47,7 +45,7 @@ pub fn solve_part_2(lines_iter: std::slice::Iter<String>) -> usize {
     return 0;
 }
 
-fn get_numbers(lines_iter: std::slice::Iter<String>) -> Vec<usize> {
+pub fn get_structs(lines_iter: std::slice::Iter<String>) -> Vec<usize> {
     let numbers: Vec<usize> = lines_iter
         .map(|it| it.parse::<usize>().unwrap())
         .collect();
@@ -59,29 +57,33 @@ fn get_numbers(lines_iter: std::slice::Iter<String>) -> Vec<usize> {
 mod tests {
     #[test]
     fn part1_test_input() {
-        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_1(year2020_day1_lines.iter()), 514579);
+        assert_eq!(super::solve_part_1(structs.as_slice()), 514579);
     }
 
     #[test]
     fn part1_real_input() {
-        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_1(year2020_day1_lines.iter()), 1014171);
+        assert_eq!(super::solve_part_1(structs.as_slice()), 1014171);
     }
 
     #[test]
     fn part2_test_input() {
-        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_2(year2020_day1_lines.iter()), 241861950);
+        assert_eq!(super::solve_part_2(structs.as_slice()), 241861950);
     }
 
     #[test]
     fn part2_real_input() {
-        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+        let structs = super::get_structs(lines.iter());
 
-        assert_eq!(super::solve_part_2(year2020_day1_lines.iter()), 46584630);
+        assert_eq!(super::solve_part_2(structs.as_slice()), 46584630);
     }
 }
