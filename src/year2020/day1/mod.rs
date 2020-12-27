@@ -1,7 +1,3 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
-
 pub fn solve_part_1(filename: &str) -> usize {
     let numbers = get_numbers(filename);
     let mut i = 0;
@@ -51,25 +47,12 @@ pub fn solve_part_2(filename: &str) -> usize {
     return 0;
 }
 
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
-
 fn get_numbers(filename: &str) -> Vec<usize> {
-    let mut numbers: Vec<usize> = Vec::new();
-
-    if let Ok(lines) = read_lines(filename) {
-        for line in lines {
-            if let Ok(number_string) = line {
-                numbers.push(number_string.parse::<usize>().unwrap());
-            }
-        }
-    } else {
-    }
+    let lines = super::get_lines(filename);
+    let numbers: Vec<usize> = lines
+        .iter()
+        .map(|it| it.parse::<usize>().unwrap())
+        .collect();
 
     return numbers;
 }

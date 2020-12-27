@@ -1,7 +1,3 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
-
 #[derive(Debug)]
 struct LoginPolicy {
     min: usize,
@@ -45,7 +41,7 @@ pub fn solve_part_2(filename: &str) -> usize {
 }
 
 fn login_policies(filename: &str) -> Vec<LoginPolicy> {
-    let passwords_policy_lines = get_lines(filename);
+    let passwords_policy_lines = super::get_lines(filename);
     let mut login_policies: Vec<LoginPolicy> = Vec::new();
 
     // Build login structs
@@ -78,30 +74,6 @@ fn login_policies(filename: &str) -> Vec<LoginPolicy> {
 
     // println!("login_policies={:?}", login_policies);
     return login_policies;
-}
-
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
-
-fn get_lines(filename: &str) -> Vec<String> {
-    let mut lines: Vec<String> = Vec::new();
-
-    if let Ok(file_lines) = read_lines(filename) {
-        for file_line in file_lines {
-            if let Ok(line_string) = file_line {
-                lines.push(line_string);
-            }
-        }
-    } else {
-        println!("Error reading file {}", filename);
-    }
-
-    return lines;
 }
 
 #[cfg(test)]
