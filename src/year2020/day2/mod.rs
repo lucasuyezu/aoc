@@ -22,8 +22,8 @@ impl LoginPolicy {
     }
 }
 
-pub fn solve_part_1(filename: &str) -> usize {
-    let valid_login_policies: Vec<LoginPolicy> = login_policies(filename)
+pub fn solve_part_1(lines: &Vec<String>) -> usize {
+    let valid_login_policies: Vec<LoginPolicy> = login_policies(lines)
         .into_iter()
         .filter(|it| it.is_valid_part_1())
         .collect();
@@ -31,8 +31,8 @@ pub fn solve_part_1(filename: &str) -> usize {
     return valid_login_policies.len();
 }
 
-pub fn solve_part_2(filename: &str) -> usize {
-    let valid_login_policies: Vec<LoginPolicy> = login_policies(filename)
+pub fn solve_part_2(lines: &Vec<String>) -> usize {
+    let valid_login_policies: Vec<LoginPolicy> = login_policies(lines)
         .into_iter()
         .filter(|it| it.is_valid_part_2())
         .collect();
@@ -40,8 +40,7 @@ pub fn solve_part_2(filename: &str) -> usize {
     return valid_login_policies.len();
 }
 
-fn login_policies(filename: &str) -> Vec<LoginPolicy> {
-    let passwords_policy_lines = super::get_lines(filename);
+fn login_policies(passwords_policy_lines: &Vec<String>) -> Vec<LoginPolicy> {
     let mut login_policies: Vec<LoginPolicy> = Vec::new();
 
     // Build login structs
@@ -80,21 +79,29 @@ fn login_policies(filename: &str) -> Vec<LoginPolicy> {
 mod tests {
     #[test]
     fn part1_test_input() {
-        assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input"), 3);
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input");
+
+        assert_eq!(super::solve_part_1(&lines), 3);
     }
 
     #[test]
     fn part1_real_input() {
-        assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input"), 393);
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input");
+
+        assert_eq!(super::solve_part_1(&lines), 393);
     }
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input"), 2);
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input");
+
+        assert_eq!(super::solve_part_2(&lines), 2);
     }
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input"), 690);
+        let lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input");
+
+        assert_eq!(super::solve_part_2(&lines), 690);
     }
 }

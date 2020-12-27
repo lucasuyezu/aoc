@@ -1,5 +1,5 @@
-pub fn solve_part_1(filename: &str) -> usize {
-    let numbers = get_numbers(filename);
+pub fn solve_part_1(lines: &Vec<String>) -> usize {
+    let numbers = get_numbers(lines);
     let mut i = 0;
     let mut j = 1;
 
@@ -18,8 +18,8 @@ pub fn solve_part_1(filename: &str) -> usize {
     return 0;
 }
 
-pub fn solve_part_2(filename: &str) -> usize {
-    let numbers = get_numbers(filename);
+pub fn solve_part_2(lines: &Vec<String>) -> usize {
+    let numbers = get_numbers(lines);
     let mut i = 0;
     let mut j = 1;
     let mut k = 2;
@@ -47,8 +47,7 @@ pub fn solve_part_2(filename: &str) -> usize {
     return 0;
 }
 
-fn get_numbers(filename: &str) -> Vec<usize> {
-    let lines = super::get_lines(filename);
+fn get_numbers(lines: &Vec<String>) -> Vec<usize> {
     let numbers: Vec<usize> = lines
         .iter()
         .map(|it| it.parse::<usize>().unwrap())
@@ -61,21 +60,29 @@ fn get_numbers(filename: &str) -> Vec<usize> {
 mod tests {
     #[test]
     fn part1_test_input() {
-        assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"), 514579);
+        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+
+        assert_eq!(super::solve_part_1(&year2020_day1_lines), 514579);
     }
 
     #[test]
     fn part1_real_input() {
-        assert_eq!(super::solve_part_1("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"), 1014171);
+        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+
+        assert_eq!(super::solve_part_1(&year2020_day1_lines), 1014171);
     }
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"), 241861950);
+        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input");
+
+        assert_eq!(super::solve_part_2(&year2020_day1_lines), 241861950);
     }
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"), 46584630);
+        let year2020_day1_lines = super::super::get_lines("/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input");
+
+        assert_eq!(super::solve_part_2(&year2020_day1_lines), 46584630);
     }
 }

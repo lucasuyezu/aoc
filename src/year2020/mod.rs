@@ -13,7 +13,7 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
-fn get_lines(filename: &str) -> Vec<String> {
+pub fn get_lines(filename: &str) -> Vec<String> {
     let mut lines: Vec<String> = Vec::new();
 
     if let Ok(file_lines) = read_lines(filename) {
