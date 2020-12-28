@@ -1,33 +1,53 @@
 use std::sync::Arc;
 use std::thread;
+use std::time::Instant;
 
 mod year2020;
 
 fn main() {
     let t2020_03 = thread::spawn(|| {
+        let mut now = Instant::now();
         let lines = year2020::get_lines(
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/input",
         );
+        let read_file_duration = now.elapsed();
+
+        now = Instant::now();
         let slope_map = Arc::new(year2020::day3::get_structs(lines));
+        let parse_duration = now.elapsed();
 
         let slope_map_t2 = slope_map.clone();
         let t2 = thread::spawn(move || {
+            let t2_instant = Instant::now();
             let result_1 = year2020::day3::solve(&slope_map_t2, 1, 1);
             let result_2 = year2020::day3::solve(&slope_map_t2, 3, 1);
             let result_3 = year2020::day3::solve(&slope_map_t2, 5, 1);
             let result_4 = year2020::day3::solve(&slope_map_t2, 7, 1);
             let result_5 = year2020::day3::solve(&slope_map_t2, 1, 2);
+            let solve_duration = t2_instant.elapsed();
 
             println!(
-                "Year 2020 Day 3 Part 2 result is {}",
-                result_1 * result_2 * result_3 * result_4 * result_5
+                "Year 2020 Day 3 Part 2 read_file_duration={:?}\tparse_duration={:?}\tsolve_duration={:?}\tresult={}",
+                read_file_duration,
+                parse_duration,
+                solve_duration,
+                result_1 * result_2 * result_3 * result_4 * result_5,
             );
         });
 
         let slope_map_t1 = slope_map.clone();
         let t1 = thread::spawn(move || {
+            let t1_instant = Instant::now();
             let result = year2020::day3::solve(&slope_map_t1, 3, 1);
-            println!("Year 2020 Day 3 Part 1 result is {}", result);
+            let solve_duration = t1_instant.elapsed();
+
+            println!(
+                "Year 2020 Day 3 Part 1 read_file_duration={:?}\tparse_duration={:?}\tsolve_duration={:?}\tresult={}",
+                read_file_duration,
+                parse_duration,
+                solve_duration,
+                result,
+            );
         });
 
         t2.join().expect("Year 2020 Day 3 Part 2 has panicked!");
