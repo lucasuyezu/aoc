@@ -1,4 +1,6 @@
-pub fn solve_part_1(numbers: &[usize]) -> usize {
+pub fn solve_part_1(lines: &Vec<String>) -> usize {
+    let numbers = get_structs(lines);
+
     let mut i = 0;
     let mut j = 1;
 
@@ -17,7 +19,9 @@ pub fn solve_part_1(numbers: &[usize]) -> usize {
     return 0;
 }
 
-pub fn solve_part_2(numbers: &[usize]) -> usize {
+pub fn solve_part_2(lines: &Vec<String>) -> usize {
+    let numbers = get_structs(lines);
+
     let mut i = 0;
     let mut j = 1;
     let mut k = 2;
@@ -45,8 +49,11 @@ pub fn solve_part_2(numbers: &[usize]) -> usize {
     return 0;
 }
 
-pub fn get_structs(lines: Vec<String>) -> Vec<usize> {
-    let numbers: Vec<usize> = lines.iter().map(|it| it.parse::<usize>().unwrap()).collect();
+fn get_structs(lines: &Vec<String>) -> Vec<usize> {
+    let numbers: Vec<usize> = lines
+        .iter()
+        .map(|it| it.parse::<usize>().unwrap())
+        .collect();
 
     return numbers;
 }
@@ -59,9 +66,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_1(structs.as_slice()), 514579);
+        assert_eq!(super::solve_part_1(&lines), 514579);
     }
 
     #[test]
@@ -70,9 +75,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_1(structs.as_slice()), 1014171);
+        assert_eq!(super::solve_part_1(&lines), 1014171);
     }
 
     #[test]
@@ -81,9 +84,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_2(structs.as_slice()), 241861950);
+        assert_eq!(super::solve_part_2(&lines), 241861950);
     }
 
     #[test]
@@ -92,8 +93,6 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_2(structs.as_slice()), 46584630);
+        assert_eq!(super::solve_part_2(&lines), 46584630);
     }
 }

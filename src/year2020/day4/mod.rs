@@ -88,15 +88,17 @@ impl Passport {
     }
 }
 
-pub fn solve_part_1(passports: &[Passport]) -> usize {
+pub fn solve_part_1(lines: &Vec<String>) -> usize {
+    let passports = get_structs(lines);
     return passports.iter().filter(|it| it.is_valid_part_1()).count();
 }
 
-pub fn solve_part_2(passports: &[Passport]) -> usize {
+pub fn solve_part_2(lines: &Vec<String>) -> usize {
+    let passports = get_structs(lines);
     return passports.iter().filter(|it| it.is_valid_part_2()).count();
 }
 
-pub fn get_structs(passport_lines: Vec<String>) -> Vec<Passport> {
+fn get_structs(passport_lines: &Vec<String>) -> Vec<Passport> {
     let mut passports: Vec<Passport> = Vec::new();
 
     let mut byr: Option<u16> = None;
@@ -200,9 +202,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day4/test_input_part_1"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_1(structs.as_slice()), 2);
+        assert_eq!(super::solve_part_1(&lines), 2);
     }
 
     #[test]
@@ -211,9 +211,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day4/input"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_1(structs.as_slice()), 190);
+        assert_eq!(super::solve_part_1(&lines), 190);
     }
 
     #[test]
@@ -222,9 +220,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day4/test_input_part_2"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_2(structs.as_slice()), 4);
+        assert_eq!(super::solve_part_2(&lines), 4);
     }
 
     #[test]
@@ -233,8 +229,6 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day4/input"
                 .to_string(),
         );
-        let structs = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_2(structs.as_slice()), 121);
+        assert_eq!(super::solve_part_2(&lines), 121);
     }
 }

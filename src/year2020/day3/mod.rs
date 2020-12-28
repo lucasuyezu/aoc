@@ -36,11 +36,15 @@ impl SlopeMap {
     }
 }
 
-pub fn solve_part_1(slope_map: &SlopeMap) -> usize {
+pub fn solve_part_1(lines: &Vec<String>) -> usize {
+    let slope_map = get_structs(lines);
+
     return slope_map.traverse(3, 1);
 }
 
-pub fn solve_part_2(slope_map: &SlopeMap) -> usize {
+pub fn solve_part_2(lines: &Vec<String>) -> usize {
+    let slope_map = get_structs(lines);
+
     let result_1 = slope_map.traverse(1, 1);
     let result_2 = slope_map.traverse(3, 1);
     let result_3 = slope_map.traverse(5, 1);
@@ -50,8 +54,10 @@ pub fn solve_part_2(slope_map: &SlopeMap) -> usize {
     return result_1 * result_2 * result_3 * result_4 * result_5;
 }
 
-pub fn get_structs(lines: Vec<String>) -> SlopeMap {
-    return SlopeMap { map: lines };
+fn get_structs(lines: &Vec<String>) -> SlopeMap {
+    return SlopeMap {
+        map: lines.to_vec(),
+    };
 }
 
 #[cfg(test)]
@@ -62,9 +68,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input"
                 .to_string(),
         );
-        let slope_map = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_1(&slope_map), 7);
+        assert_eq!(super::solve_part_1(&lines), 7);
     }
 
     #[test]
@@ -73,9 +77,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input"
                 .to_string(),
         );
-        let slope_map = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_2(&slope_map), 336);
+        assert_eq!(super::solve_part_2(&lines), 336);
     }
 
     #[test]
@@ -84,9 +86,7 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/input"
                 .to_string(),
         );
-        let slope_map = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_1(&slope_map), 164);
+        assert_eq!(super::solve_part_1(&lines), 164);
     }
 
     #[test]
@@ -95,8 +95,6 @@ mod tests {
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/input"
                 .to_string(),
         );
-        let slope_map = super::get_structs(lines);
-
-        assert_eq!(super::solve_part_2(&slope_map), 5007658656);
+        assert_eq!(super::solve_part_2(&lines), 5007658656);
     }
 }
