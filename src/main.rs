@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 use std::sync::Arc;
 use std::thread;
 use std::time::Instant;
@@ -57,6 +60,7 @@ macro_rules! solve {
 
 fn main() {
     let threads = vec![
+        thread::spawn(|| { solve!(year2020, day4); }),
         thread::spawn(|| { solve!(year2020, day3); }),
         thread::spawn(|| { solve!(year2020, day2); }),
         thread::spawn(|| { solve!(year2020, day1); }),
