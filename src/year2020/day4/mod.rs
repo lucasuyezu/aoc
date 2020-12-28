@@ -89,17 +89,16 @@ impl Passport {
 }
 
 pub fn solve_part_1(lines: &Vec<String>) -> usize {
-    let passports = get_structs(lines);
-    return passports.iter().filter(|it| it.is_valid_part_1()).count();
+    return solve(lines, "part1");
 }
 
 pub fn solve_part_2(lines: &Vec<String>) -> usize {
-    let passports = get_structs(lines);
-    return passports.iter().filter(|it| it.is_valid_part_2()).count();
+    return solve(lines, "part2");
 }
 
-fn get_structs(passport_lines: &Vec<String>) -> Vec<Passport> {
-    let mut passports: Vec<Passport> = Vec::new();
+fn solve(passport_lines: &Vec<String>, part: &str) -> usize {
+    let mut valid_passport_count = 0;
+    let mut passport: Passport;
 
     let mut byr: Option<u16> = None;
     let mut iyr: Option<u16> = None;
@@ -116,8 +115,7 @@ fn get_structs(passport_lines: &Vec<String>) -> Vec<Passport> {
         // println!("passport_line={}", passport_line);
 
         if passport_line.as_str().is_empty() {
-            // Add passport to vec
-            passports.push(Passport {
+            passport = Passport {
                 byr: byr,
                 iyr: iyr,
                 eyr: eyr,
@@ -127,7 +125,15 @@ fn get_structs(passport_lines: &Vec<String>) -> Vec<Passport> {
                 ecl: ecl,
                 pid: pid,
                 cid: cid,
-            });
+            };
+
+            if part == "part1" && passport.is_valid_part_1() {
+                valid_passport_count += 1;
+            }
+
+            if part == "part2" && passport.is_valid_part_2() {
+                valid_passport_count += 1;
+            }
 
             byr = None;
             iyr = None;
@@ -178,7 +184,7 @@ fn get_structs(passport_lines: &Vec<String>) -> Vec<Passport> {
         }
     }
 
-    passports.push(Passport {
+    passport = Passport {
         byr: byr,
         iyr: iyr,
         eyr: eyr,
@@ -188,10 +194,17 @@ fn get_structs(passport_lines: &Vec<String>) -> Vec<Passport> {
         ecl: ecl,
         pid: pid,
         cid: cid,
-    });
+    };
 
-    // println!("passports={:?}", passports);
-    return passports;
+    if part == "part1" && passport.is_valid_part_1() {
+        valid_passport_count += 1;
+    }
+
+    if part == "part2" && passport.is_valid_part_2() {
+        valid_passport_count += 1;
+    }
+
+    return valid_passport_count;
 }
 
 #[cfg(test)]
