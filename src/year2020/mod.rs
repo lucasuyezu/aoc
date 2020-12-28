@@ -14,10 +14,10 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
-pub fn get_lines(filename: &str) -> Vec<String> {
+pub fn get_lines(filename: String) -> Vec<String> {
     let mut lines: Vec<String> = Vec::new();
 
-    if let Ok(file_lines) = read_lines(filename) {
+    if let Ok(file_lines) = read_lines(&filename) {
         for file_line in file_lines {
             if let Ok(line_string) = file_line {
                 lines.push(line_string);

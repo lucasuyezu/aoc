@@ -36,8 +36,18 @@ impl SlopeMap {
     }
 }
 
-pub fn solve(slope_map: &SlopeMap, right_slope: usize, down_slope: usize) -> usize {
-    return slope_map.traverse(right_slope, down_slope);
+pub fn solve_part_1(slope_map: &SlopeMap) -> usize {
+    return slope_map.traverse(3, 1);
+}
+
+pub fn solve_part_2(slope_map: &SlopeMap) -> usize {
+    let result_1 = slope_map.traverse(1, 1);
+    let result_2 = slope_map.traverse(3, 1);
+    let result_3 = slope_map.traverse(5, 1);
+    let result_4 = slope_map.traverse(7, 1);
+    let result_5 = slope_map.traverse(1, 2);
+
+    return result_1 * result_2 * result_3 * result_4 * result_5;
 }
 
 pub fn get_structs(lines: Vec<String>) -> SlopeMap {
@@ -49,48 +59,44 @@ mod tests {
     #[test]
     fn part1_test_input() {
         let lines = super::super::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input",
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input"
+                .to_string(),
         );
         let slope_map = super::get_structs(lines);
 
-        assert_eq!(super::solve(&slope_map, 3, 1), 7);
+        assert_eq!(super::solve_part_1(&slope_map), 7);
     }
 
     #[test]
     fn part2_test_input() {
         let lines = super::super::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input",
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input"
+                .to_string(),
         );
         let slope_map = super::get_structs(lines);
 
-        assert_eq!(super::solve(&slope_map, 1, 1), 2);
-        assert_eq!(super::solve(&slope_map, 3, 1), 7);
-        assert_eq!(super::solve(&slope_map, 5, 1), 3);
-        assert_eq!(super::solve(&slope_map, 7, 1), 4);
-        assert_eq!(super::solve(&slope_map, 1, 2), 2);
+        assert_eq!(super::solve_part_2(&slope_map), 336);
     }
 
     #[test]
     fn part1_real_input() {
         let lines = super::super::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/input",
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/input"
+                .to_string(),
         );
         let slope_map = super::get_structs(lines);
 
-        assert_eq!(super::solve(&slope_map, 3, 1), 164);
+        assert_eq!(super::solve_part_1(&slope_map), 164);
     }
 
     #[test]
     fn part2_real_input() {
         let lines = super::super::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/input",
+            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day3/input"
+                .to_string(),
         );
         let slope_map = super::get_structs(lines);
 
-        assert_eq!(super::solve(&slope_map, 1, 1), 93);
-        assert_eq!(super::solve(&slope_map, 3, 1), 164);
-        assert_eq!(super::solve(&slope_map, 5, 1), 82);
-        assert_eq!(super::solve(&slope_map, 7, 1), 91);
-        assert_eq!(super::solve(&slope_map, 1, 2), 44);
+        assert_eq!(super::solve_part_2(&slope_map), 5007658656);
     }
 }
