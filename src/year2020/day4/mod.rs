@@ -98,35 +98,24 @@ pub fn solve_part_2(lines: &Vec<String>) -> usize {
 
 fn solve(passport_lines: &Vec<String>, part: &str) -> usize {
     let mut valid_passport_count = 0;
-    let mut passport: Passport;
 
-    let mut byr: Option<u16> = None;
-    let mut iyr: Option<u16> = None;
-    let mut eyr: Option<u16> = None;
-    let mut hgt_unit: Option<String> = None;
-    let mut hgt_value: Option<u16> = None;
-    let mut hcl: Option<String> = None;
-    let mut ecl: Option<String> = None;
-    let mut pid: Option<String> = None;
-    let mut cid: Option<u16> = None;
+    let mut passport = Passport {
+        byr: None,
+        iyr: None,
+        eyr: None,
+        hgt_unit: None,
+        hgt_value: None,
+        hcl: None,
+        ecl: None,
+        pid: None,
+        cid: None,
+    };
 
     // Build passports
     for passport_line in passport_lines {
         // println!("passport_line={}", passport_line);
 
         if passport_line.as_str().is_empty() {
-            passport = Passport {
-                byr: byr,
-                iyr: iyr,
-                eyr: eyr,
-                hgt_unit: hgt_unit,
-                hgt_value: hgt_value,
-                hcl: hcl,
-                ecl: ecl,
-                pid: pid,
-                cid: cid,
-            };
-
             if part == "part1" && passport.is_valid_part_1() {
                 valid_passport_count += 1;
             }
@@ -135,15 +124,15 @@ fn solve(passport_lines: &Vec<String>, part: &str) -> usize {
                 valid_passport_count += 1;
             }
 
-            byr = None;
-            iyr = None;
-            eyr = None;
-            hgt_unit = None;
-            hgt_value = None;
-            hcl = None;
-            ecl = None;
-            pid = None;
-            cid = None;
+            passport.byr = None;
+            passport.iyr = None;
+            passport.eyr = None;
+            passport.hgt_unit = None;
+            passport.hgt_value = None;
+            passport.hcl = None;
+            passport.ecl = None;
+            passport.pid = None;
+            passport.cid = None;
         } else {
             // Split line at spaces
             for field in passport_line.split_whitespace() {
@@ -151,50 +140,38 @@ fn solve(passport_lines: &Vec<String>, part: &str) -> usize {
                 let (_, value) = field.split_at(4);
 
                 if field.starts_with("byr") {
-                    byr = Some(value.parse::<u16>().unwrap());
+                    passport.byr = Some(value.parse::<u16>().unwrap());
                 }
                 if field.starts_with("iyr") {
-                    iyr = Some(value.parse::<u16>().unwrap());
+                    passport.iyr = Some(value.parse::<u16>().unwrap());
                 }
                 if field.starts_with("eyr") {
-                    eyr = Some(value.parse::<u16>().unwrap());
+                    passport.eyr = Some(value.parse::<u16>().unwrap());
                 }
                 if field.starts_with("hgt") {
                     if field.ends_with("cm") || field.ends_with("in") {
                         let (v, u) = value.split_at(value.len() - 2);
-                        hgt_unit = Some(u.to_string());
-                        hgt_value = Some(v.parse::<u16>().unwrap());
+                        passport.hgt_unit = Some(u.to_string());
+                        passport.hgt_value = Some(v.parse::<u16>().unwrap());
                     } else {
-                        hgt_value = Some(value.parse::<u16>().unwrap());
+                        passport.hgt_value = Some(value.parse::<u16>().unwrap());
                     }
                 }
                 if field.starts_with("hcl") {
-                    hcl = Some(value.to_string());
+                    passport.hcl = Some(value.to_string());
                 }
                 if field.starts_with("ecl") {
-                    ecl = Some(value.to_string());
+                    passport.ecl = Some(value.to_string());
                 }
                 if field.starts_with("pid") {
-                    pid = Some(value.to_string());
+                    passport.pid = Some(value.to_string());
                 }
                 if field.starts_with("cid") {
-                    cid = Some(value.parse::<u16>().unwrap());
+                    passport.cid = Some(value.parse::<u16>().unwrap());
                 }
             }
         }
     }
-
-    passport = Passport {
-        byr: byr,
-        iyr: iyr,
-        eyr: eyr,
-        hgt_unit: hgt_unit,
-        hgt_value: hgt_value,
-        hcl: hcl,
-        ecl: ecl,
-        pid: pid,
-        cid: cid,
-    };
 
     if part == "part1" && passport.is_valid_part_1() {
         valid_passport_count += 1;
