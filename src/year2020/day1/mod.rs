@@ -20,7 +20,9 @@ pub fn solve_part_1(lines: &Vec<String>) -> usize {
 }
 
 pub fn solve_part_2(lines: &Vec<String>) -> usize {
-    let numbers = get_structs(lines);
+    let mut numbers = get_structs(lines);
+
+    numbers.sort();
 
     let mut i = 0;
     let mut j = 1;
@@ -28,10 +30,15 @@ pub fn solve_part_2(lines: &Vec<String>) -> usize {
 
     while i < numbers.len() - 2 {
         while j < numbers.len() - 1 {
+            if numbers[i] + numbers[j] >= 2020 {
+                k = 1;
+                j += 1;
+                continue;
+            }
+
             while k < numbers.len() {
                 if numbers[i] + numbers[j] + numbers[k] == 2020 {
                     return numbers[i] * numbers[j] * numbers[k];
-                } else {
                 }
 
                 k += 1;
