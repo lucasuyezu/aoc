@@ -11,20 +11,17 @@ impl BoardingGroup {
 
         for line in &self.lines {
             for c in line.chars() {
-                if result.contains_key(&c) {
-                    let _x = result.insert(c, *result.get(&c).unwrap() + 1);
-                } else {
-                    result.insert(c, 1);
-                }
+                let v = result.entry(c).or_insert(0);
+                *v += 1;
             }
         }
 
         // dbg!(&result);
-        return result;
+        result
     }
 
     fn one_answer_count(&self) -> usize {
-        return self.answers_map().len();
+        self.answers_map().len()
     }
 
     fn all_answer_count(&self) -> usize {
@@ -35,25 +32,25 @@ impl BoardingGroup {
             .filter(|&(_k, v)| *v == self.lines.len())
             .collect();
 
-        return all_answers.len();
+        all_answers.len()
     }
 }
 
-pub fn solve_part_1(lines: &Vec<String>) -> usize {
+pub fn solve_part_1(lines: &[String]) -> usize {
     return boarding_groups(lines)
         .iter()
         .map(|group| group.one_answer_count())
         .sum();
 }
 
-pub fn solve_part_2(lines: &Vec<String>) -> usize {
+pub fn solve_part_2(lines: &[String]) -> usize {
     return boarding_groups(lines)
         .iter()
         .map(|group| group.all_answer_count())
         .sum();
 }
 
-fn boarding_groups(lines: &Vec<String>) -> Vec<BoardingGroup> {
+fn boarding_groups(lines: &[String]) -> Vec<BoardingGroup> {
     let mut boarding_groups = Vec::<BoardingGroup>::new();
     let mut current_group_lines = Vec::<String>::new();
 
@@ -77,7 +74,7 @@ fn boarding_groups(lines: &Vec<String>) -> Vec<BoardingGroup> {
 
     boarding_groups.push(boarding_group);
 
-    return boarding_groups;
+    boarding_groups
 }
 
 #[cfg(test)]

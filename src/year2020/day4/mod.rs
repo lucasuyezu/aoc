@@ -15,13 +15,13 @@ pub struct Passport {
 
 impl Passport {
     fn is_valid_part_1(&self) -> bool {
-        return self.byr != None
+        self.byr != None
             && self.iyr != None
             && self.eyr != None
             && self.hgt_value != None
             && self.hcl != None
             && self.ecl != None
-            && self.pid != None;
+            && self.pid != None
     }
 
     fn is_height_valid_part_2(&self) -> bool {
@@ -32,7 +32,7 @@ impl Passport {
         let u = self.hgt_unit.as_ref().unwrap();
         let v: u16 = *self.hgt_value.as_ref().unwrap();
 
-        return (u == "cm" && (150..194).contains(&v)) || (u == "in" && (59..77).contains(&v));
+        (u == "cm" && (150..194).contains(&v)) || (u == "in" && (59..77).contains(&v))
     }
 
     fn is_hcl_valid_part_2(&self) -> bool {
@@ -53,13 +53,14 @@ impl Passport {
         }
 
         let v = self.ecl.as_ref().unwrap();
-        return v == "amb"
+
+        v == "amb"
             || v == "blu"
             || v == "brn"
             || v == "gry"
             || v == "grn"
             || v == "hzl"
-            || v == "oth";
+            || v == "oth"
     }
 
     fn is_pid_valid_part_2(&self) -> bool {
@@ -75,7 +76,7 @@ impl Passport {
     }
 
     fn is_valid_part_2(&self) -> bool {
-        return self.byr != None
+        self.byr != None
             && (1920..2003).contains(&self.byr.unwrap())
             && self.iyr != None
             && (2010..2021).contains(&self.iyr.unwrap())
@@ -84,19 +85,19 @@ impl Passport {
             && self.is_height_valid_part_2()
             && self.is_hcl_valid_part_2()
             && self.is_ecl_valid_part_2()
-            && self.is_pid_valid_part_2();
+            && self.is_pid_valid_part_2()
     }
 }
 
-pub fn solve_part_1(lines: &Vec<String>) -> usize {
-    return solve(lines, "part1");
+pub fn solve_part_1(lines: &[String]) -> usize {
+    solve(lines, "part1")
 }
 
-pub fn solve_part_2(lines: &Vec<String>) -> usize {
-    return solve(lines, "part2");
+pub fn solve_part_2(lines: &[String]) -> usize {
+    solve(lines, "part2")
 }
 
-fn solve(passport_lines: &Vec<String>, part: &str) -> usize {
+fn solve(passport_lines: &[String], part: &str) -> usize {
     let mut valid_passport_count = 0;
 
     let mut passport = Passport {
@@ -181,7 +182,7 @@ fn solve(passport_lines: &Vec<String>, part: &str) -> usize {
         valid_passport_count += 1;
     }
 
-    return valid_passport_count;
+    valid_passport_count
 }
 
 #[cfg(test)]

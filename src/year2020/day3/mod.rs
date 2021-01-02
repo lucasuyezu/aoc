@@ -32,17 +32,17 @@ impl SlopeMap {
             // println!("row={} current_row={} current_column={} cell={} trees_touched={}", row, current_row, current_column, cell, trees_touched);
         }
 
-        return trees_touched;
+        trees_touched
     }
 }
 
-pub fn solve_part_1(lines: &Vec<String>) -> usize {
+pub fn solve_part_1(lines: &[String]) -> usize {
     let slope_map = get_structs(lines);
 
-    return slope_map.traverse(3, 1);
+    slope_map.traverse(3, 1)
 }
 
-pub fn solve_part_2(lines: &Vec<String>) -> usize {
+pub fn solve_part_2(lines: &[String]) -> usize {
     let slope_map = get_structs(lines);
 
     let result_1 = slope_map.traverse(1, 1);
@@ -51,13 +51,13 @@ pub fn solve_part_2(lines: &Vec<String>) -> usize {
     let result_4 = slope_map.traverse(7, 1);
     let result_5 = slope_map.traverse(1, 2);
 
-    return result_1 * result_2 * result_3 * result_4 * result_5;
+    result_1 * result_2 * result_3 * result_4 * result_5
 }
 
-fn get_structs(lines: &Vec<String>) -> SlopeMap {
-    return SlopeMap {
+fn get_structs(lines: &[String]) -> SlopeMap {
+    SlopeMap {
         map: lines.to_vec(),
-    };
+    }
 }
 
 #[cfg(test)]

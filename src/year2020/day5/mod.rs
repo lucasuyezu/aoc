@@ -13,29 +13,20 @@ struct Seat {
 
 impl Seat {
     fn seat_id(&self) -> usize {
-        return self.row_id * 8 + self.column_id;
+        self.row_id * 8 + self.column_id
     }
 }
 
 impl BoardingPass<'_> {
     fn row_id(&self) -> usize {
-        let row_id = self.find_id(0, 127, &self.string[0..7]);
-        // println!("Will return row_id {}", row_id);
-        return row_id;
+        self.find_id(0, 127, &self.string[0..7])
     }
 
     fn column_id(&self) -> usize {
-        let column_id = self.find_id(0, 7, &self.string[7..10]);
-        // println!("Will return column_id {}", column_id);
-        return column_id;
+        self.find_id(0, 7, &self.string[7..10])
     }
 
-    fn find_id(
-        &self,
-        mut range_low: usize,
-        mut range_high: usize,
-        substr: &str,
-    ) -> usize {
+    fn find_id(&self, mut range_low: usize, mut range_high: usize, substr: &str) -> usize {
         let mut last = false;
 
         for current_char in substr.chars() {
@@ -53,14 +44,14 @@ impl BoardingPass<'_> {
         }
 
         if last {
-            return range_low;
+            range_low
         } else {
-            return range_high;
+            range_high
         }
     }
 }
 
-pub fn solve_part_1(lines: &Vec<String>) -> usize {
+pub fn solve_part_1(lines: &[String]) -> usize {
     let mut highest_seat_id = 0;
 
     for line in lines {
@@ -77,10 +68,10 @@ pub fn solve_part_1(lines: &Vec<String>) -> usize {
         }
     }
 
-    return highest_seat_id;
+    highest_seat_id
 }
 
-pub fn solve_part_2(lines: &Vec<String>) -> usize {
+pub fn solve_part_2(lines: &[String]) -> usize {
     // create set to store all seats, based on row_id + column_id
     let mut seats = HashSet::new();
     let mut current_seat: Seat;
@@ -102,10 +93,7 @@ pub fn solve_part_2(lines: &Vec<String>) -> usize {
             }
 
             // println!("Testing row_id {} column_id {}", row_id, column_id);
-            current_seat = Seat {
-                row_id: row_id,
-                column_id: column_id,
-            };
+            current_seat = Seat { row_id, column_id };
             if !seats.contains(&current_seat) {
                 // println!(
                 //     "Missing seat {:?} with seat id {}",

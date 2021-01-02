@@ -7,7 +7,7 @@ struct BagRule {
     quantity: usize,
 }
 
-pub fn solve_part_1(lines: &Vec<String>) -> usize {
+pub fn solve_part_1(lines: &[String]) -> usize {
     // build hash map of bag handle => rules
     let mut inverted_tree_map = HashMap::<String, HashSet<String>>::new();
 
@@ -31,14 +31,10 @@ pub fn solve_part_1(lines: &Vec<String>) -> usize {
             .to_string();
 
             // upsert bag_handle to its children
-            if inverted_tree_map.contains_key(&rule_handle_string) {
-                let rules_set = inverted_tree_map.get_mut(&rule_handle_string).unwrap();
-                rules_set.insert(bag_handle.trim_end().to_string());
-            } else {
-                let mut rules_set = HashSet::<String>::new();
-                rules_set.insert(bag_handle.trim_end().to_string());
-                inverted_tree_map.insert(rule_handle_string, rules_set);
-            }
+            let rules_set = inverted_tree_map
+                .entry(rule_handle_string)
+                .or_insert_with(HashSet::<String>::new);
+            rules_set.insert(bag_handle.trim_end().to_string());
         }
     }
 
@@ -67,7 +63,7 @@ pub fn solve_part_1(lines: &Vec<String>) -> usize {
     }
 }
 
-pub fn solve_part_2(lines: &Vec<String>) -> usize {
+pub fn solve_part_2(lines: &[String]) -> usize {
     // build hash map of bag handle => rules
     let mut tree_map = HashMap::<String, HashSet<BagRule>>::new();
 
@@ -91,22 +87,13 @@ pub fn solve_part_2(lines: &Vec<String>) -> usize {
             .to_string();
 
             // upsert bag_handle to its children
-            if tree_map.contains_key(&bag_handle.trim_end().to_string()) {
-                let rules_set = tree_map
-                    .get_mut(&bag_handle.trim_end().to_string())
-                    .unwrap();
-                rules_set.insert(BagRule {
-                    handle: rule_handle_string,
-                    quantity: quantity,
-                });
-            } else {
-                let mut rules_set = HashSet::<BagRule>::new();
-                rules_set.insert(BagRule {
-                    handle: rule_handle_string,
-                    quantity: quantity,
-                });
-                tree_map.insert(bag_handle.trim_end().to_string(), rules_set);
-            }
+            let rules_set = tree_map
+                .entry(bag_handle.trim_end().to_string())
+                .or_insert_with(HashSet::<BagRule>::new);
+            rules_set.insert(BagRule {
+                handle: rule_handle_string,
+                quantity,
+            });
         }
     }
 
@@ -114,7 +101,7 @@ pub fn solve_part_2(lines: &Vec<String>) -> usize {
 
     // dbg!(&tree_map);
 
-    return traverse_tree_map(&tree_map, current_node);
+    traverse_tree_map(&tree_map, current_node)
 }
 
 fn traverse_tree_map(tree_map: &HashMap<String, HashSet<BagRule>>, current_node: String) -> usize {
@@ -129,7 +116,7 @@ fn traverse_tree_map(tree_map: &HashMap<String, HashSet<BagRule>>, current_node:
     }
 
     // dbg!(&result);
-    return result;
+    result
 }
 
 #[cfg(test)]

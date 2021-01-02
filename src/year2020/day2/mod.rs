@@ -10,30 +10,30 @@ impl LoginPolicy {
     fn is_valid_part_1(&self) -> bool {
         let matches_count = self.password.matches(self.req_char).count();
 
-        return matches_count >= self.min && matches_count <= self.max;
+        matches_count >= self.min && matches_count <= self.max
     }
 
     fn is_valid_part_2(&self) -> bool {
         let chars: Vec<char> = self.password.chars().collect();
 
         // println!("login={:?} chars[{}]={} chars[{}]", self, self.min-1, chars[self.min-1], self.max-1);
-        return (chars[self.min - 1] == self.req_char) ^ (chars[self.max - 1] == self.req_char);
+        (chars[self.min - 1] == self.req_char) ^ (chars[self.max - 1] == self.req_char)
     }
 }
 
-pub fn solve_part_1(lines: &Vec<String>) -> usize {
+pub fn solve_part_1(lines: &[String]) -> usize {
     let numbers = get_structs(lines);
 
     return numbers.iter().filter(|it| it.is_valid_part_1()).count();
 }
 
-pub fn solve_part_2(lines: &Vec<String>) -> usize {
+pub fn solve_part_2(lines: &[String]) -> usize {
     let numbers = get_structs(lines);
 
     return numbers.iter().filter(|it| it.is_valid_part_2()).count();
 }
 
-fn get_structs(lines: &Vec<String>) -> Vec<LoginPolicy> {
+fn get_structs(lines: &[String]) -> Vec<LoginPolicy> {
     let mut login_policies: Vec<LoginPolicy> = Vec::new();
 
     // Build login structs
@@ -72,15 +72,15 @@ fn get_structs(lines: &Vec<String>) -> Vec<LoginPolicy> {
         // println!("idx_low={} idx_max={} pasword={}", idx_low, idx_high, password);
 
         login_policies.push(LoginPolicy {
-            min: min,
-            max: max,
-            req_char: req_char,
-            password: password,
+            min,
+            max,
+            req_char,
+            password,
         });
     }
 
     // println!("login_policies={:?}", login_policies);
-    return login_policies;
+    login_policies
 }
 
 #[cfg(test)]

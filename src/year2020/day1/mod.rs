@@ -1,4 +1,4 @@
-pub fn solve_part_1(lines: &Vec<String>) -> usize {
+pub fn solve_part_1(lines: &[String]) -> usize {
     let numbers = get_structs(lines);
 
     let mut i = 0;
@@ -16,13 +16,13 @@ pub fn solve_part_1(lines: &Vec<String>) -> usize {
         i += 1;
     }
 
-    return 0;
+    0
 }
 
-pub fn solve_part_2(lines: &Vec<String>) -> usize {
+pub fn solve_part_2(lines: &[String]) -> usize {
     let mut numbers = get_structs(lines);
 
-    numbers.sort();
+    numbers.sort_unstable();
 
     let mut i = 0;
     let mut j = 1;
@@ -53,16 +53,16 @@ pub fn solve_part_2(lines: &Vec<String>) -> usize {
         i += 1;
     }
 
-    return 0;
+    0
 }
 
-fn get_structs(lines: &Vec<String>) -> Vec<usize> {
+fn get_structs(lines: &[String]) -> Vec<usize> {
     let numbers: Vec<usize> = lines
         .iter()
         .map(|it| it.parse::<usize>().unwrap())
         .collect();
 
-    return numbers;
+    numbers
 }
 
 #[cfg(test)]

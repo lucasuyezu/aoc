@@ -31,5 +31,5 @@ pub fn get_lines(filename: String) -> Vec<String> {
         println!("Error reading file {}", filename);
     }
 
-    return lines;
+    lines
 }
