@@ -57,6 +57,9 @@ macro_rules! solve {
 fn main() {
     let threads = vec![
         thread::spawn(|| {
+            solve!(year2020, day8);
+        }),
+        thread::spawn(|| {
             solve!(year2020, day7);
         }),
         thread::spawn(|| {
