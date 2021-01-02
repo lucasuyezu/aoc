@@ -99,6 +99,11 @@ pub fn solve_part_2(lines: &[String]) -> isize {
         let mut program = instructions.clone();
         let mut instruction = &mut program[i];
 
+        match instruction.opcode {
+            OpCode::Acc => continue,
+            _ => (),
+        }
+
         // replace instruction id with the other one
         instruction.opcode = match instructions[i].opcode {
             OpCode::Jmp => OpCode::Nop,
