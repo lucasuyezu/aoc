@@ -3,8 +3,8 @@ extern crate lazy_static;
 
 use std::sync::Arc;
 use std::thread;
-use std::time::Instant;
-
+use std::time::{Duration, Instant};
+ 
 mod year2020;
 
 macro_rules! solve {
@@ -24,11 +24,11 @@ macro_rules! solve {
             let solve_duration = t2_instant.elapsed();
 
             println!(
-                "{} {} part2 read_file_duration={:?}\tsolve_duration={:?}\tresult={}",
+                "{} {} part2 read_file_duration={}\tsolve_duration={}\tresult={}",
                 stringify!($year),
                 stringify!($day),
-                read_file_duration,
-                solve_duration,
+                duration_with_colour(read_file_duration),
+                duration_with_colour(solve_duration),
                 result
             );
         });
@@ -40,11 +40,11 @@ macro_rules! solve {
             let solve_duration = t1_instant.elapsed();
 
             println!(
-                "{} {} part1 read_file_duration={:?}\tsolve_duration={:?}\tresult={}",
+                "{} {} part1 read_file_duration={}\tsolve_duration={}\tresult={}",
                 stringify!($year),
                 stringify!($day),
-                read_file_duration,
-                solve_duration,
+                duration_with_colour(read_file_duration),
+                duration_with_colour(solve_duration),
                 result,
             );
         });
@@ -54,38 +54,26 @@ macro_rules! solve {
     };
 }
 
-fn main() {
-    let threads = vec![
-        thread::spawn(|| {
-            solve!(year2020, day9);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day8);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day7);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day6);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day5);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day4);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day3);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day2);
-        }),
-        thread::spawn(|| {
-            solve!(year2020, day1);
-        }),
-    ];
+fn duration_with_colour(duration: Duration) -> String {
+    let color = if duration.as_micros() < 10 {
+        92
+    } else if duration.as_millis() < 1 {
+        93
+    } else {
+        31
+    };
 
-    threads
-        .into_iter()
-        .for_each(|thread| thread.join().unwrap());
+    format!("{:<20}", format!("\x1b[{}m{:?}\x1b[0m", color, duration))
+}
+ 
+fn main() {
+    solve!(year2020, day9);
+    solve!(year2020, day8);
+    solve!(year2020, day7);
+    solve!(year2020, day6);
+    solve!(year2020, day5);
+    solve!(year2020, day4);
+    solve!(year2020, day3);
+    solve!(year2020, day2);
+    solve!(year2020, day1);
 }
