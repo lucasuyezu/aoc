@@ -1,5 +1,7 @@
 pub fn solve_part_1(lines: &[String]) -> usize {
-    let numbers = get_structs(lines);
+    let mut numbers = get_structs(lines);
+
+    numbers.sort_unstable();
 
     let mut i = 0;
     let mut j = 1;
