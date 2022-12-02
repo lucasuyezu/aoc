@@ -6,6 +6,7 @@ use std::thread;
 use std::time::{Duration, Instant};
  
 mod year2020;
+mod year2022;
 mod utils;
 
 macro_rules! solve {
@@ -68,6 +69,7 @@ fn duration_with_colour(duration: Duration) -> String {
 }
  
 fn main() {
+    solve!(year2022, day1);
     solve!(year2020, day9);
     solve!(year2020, day8);
     solve!(year2020, day7);
