@@ -126,7 +126,7 @@ mod tests {
     #[test]
     fn part1_test_input() {
         let lines = utils::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input"
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input"
                 .to_string(),
         );
         assert_eq!(super::solve_part_1(&lines), 4);
@@ -135,13 +135,13 @@ mod tests {
     #[test]
     fn part2_test_inputs() {
         let mut lines = utils::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input"
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input"
                 .to_string(),
         );
         assert_eq!(super::solve_part_2(&lines), 32);
 
         lines = utils::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input_part_2"
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input_part_2"
                 .to_string(),
         );
         assert_eq!(super::solve_part_2(&lines), 126);
@@ -150,7 +150,7 @@ mod tests {
     #[test]
     fn part1_real_input() {
         let lines = utils::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day7/input"
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/input"
                 .to_string(),
         );
         assert_eq!(super::solve_part_1(&lines), 124);
@@ -159,7 +159,7 @@ mod tests {
     #[test]
     fn part2_real_input() {
         let lines = utils::get_lines(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day7/input"
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/input"
                 .to_string(),
         );
         assert_eq!(super::solve_part_2(&lines), 34862);

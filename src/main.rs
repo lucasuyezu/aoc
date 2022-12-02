@@ -12,7 +12,7 @@ macro_rules! solve {
     ($year:ident, $day:ident) => {
         let now = Instant::now();
         let lines_arc = Arc::new(utils::get_lines(format!(
-            "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
             stringify!($year),
             stringify!($day)
         )));
