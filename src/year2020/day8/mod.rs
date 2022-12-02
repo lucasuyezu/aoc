@@ -9,7 +9,6 @@ enum OpCode {
 
 #[derive(Debug, Clone)]
 struct Instruction {
-    id: usize,
     opcode: OpCode,
     argument: isize,
 }
@@ -32,23 +31,19 @@ impl Instruction {
 
 fn build_instructions(lines: &[String]) -> Vec<Instruction> {
     let mut instructions = Vec::<Instruction>::new();
-    let mut id = 0;
 
     for line in lines {
-        id += 1;
-
         let opcode = match &line[0..3] {
             "nop" => OpCode::Nop,
             "acc" => OpCode::Acc,
             "jmp" => OpCode::Jmp,
-            other => panic!(format!("Invalid instruction {} at line {}", other, id)),
+            _ => panic!("Invalid instruction!"),
         };
 
         let argument_str = &line[4..];
         let argument = argument_str.parse::<isize>().unwrap();
 
         instructions.push(Instruction {
-            id,
             opcode,
             argument,
         });
