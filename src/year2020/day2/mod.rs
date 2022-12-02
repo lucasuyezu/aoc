@@ -85,9 +85,11 @@ fn get_structs(lines: &[String]) -> Vec<LoginPolicy> {
 
 #[cfg(test)]
 mod tests {
+    use super::super::super::utils;
+
     #[test]
     fn part1_test_input() {
-        let lines = super::super::get_lines(
+        let lines = utils::get_lines(
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input"
                 .to_string(),
         );
@@ -96,7 +98,7 @@ mod tests {
 
     #[test]
     fn part1_real_input() {
-        let lines = super::super::get_lines(
+        let lines = utils::get_lines(
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input"
                 .to_string(),
         );
@@ -105,7 +107,7 @@ mod tests {
 
     #[test]
     fn part2_test_input() {
-        let lines = super::super::get_lines(
+        let lines = utils::get_lines(
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/test_input"
                 .to_string(),
         );
@@ -114,7 +116,7 @@ mod tests {
 
     #[test]
     fn part2_real_input() {
-        let lines = super::super::get_lines(
+        let lines = utils::get_lines(
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/year2020/day2/input"
                 .to_string(),
         );

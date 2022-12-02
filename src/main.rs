@@ -6,11 +6,12 @@ use std::thread;
 use std::time::{Duration, Instant};
  
 mod year2020;
+mod utils;
 
 macro_rules! solve {
     ($year:ident, $day:ident) => {
         let now = Instant::now();
-        let lines_arc = Arc::new($year::get_lines(format!(
+        let lines_arc = Arc::new(utils::get_lines(format!(
             "/Users/lucasuyezushopify/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
             stringify!($year),
             stringify!($day)
