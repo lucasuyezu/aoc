@@ -1,110 +1,70 @@
-fn build_stacks(lines: &[String]) -> Vec<Vec<char>> {
-    let line_length = lines.iter().next().unwrap().len();
-    let stack_count = if line_length == 3 {
-        1
-    } else {
-        1 + (line_length - 3) / 4
-    };
+fn build_stacks(lines: &[String]) -> (Vec<Vec<String>>, &[String], &[String]) {
+    let mut lines_split = lines.split(|line| line == "");
+    let (stack_count_line, stack_lines) = lines_split.next().unwrap().split_last().unwrap();
+    let command_lines = lines_split.next().unwrap();
 
-    return vec![Vec::new(); stack_count];
+    let stack_count = stack_count_line
+        .trim()
+        .split(" ")
+        .last()
+        .unwrap()
+        .parse()
+        .unwrap();
+
+    return (vec![Vec::new(); stack_count], stack_lines, command_lines);
+}
+
+fn populate_stacks(stacks: &mut Vec<Vec<String>>, stack_lines: &[String]) {
+    for stack_line in stack_lines {
+        let mut str_index = 1;
+        for stack in stacks.iter_mut() {
+            let crate_str = stack_line.get(str_index..str_index + 1).unwrap();
+            if crate_str != " " {
+                stack.insert(0, crate_str.to_string());
+            }
+            str_index += 4;
+        }
+    }
 }
 
 pub fn solve_part_1(lines: &[String]) -> String {
-    let mut stacks = build_stacks(lines);
+    let (mut stacks, stack_lines, command_lines) = build_stacks(lines);
 
-    let mut iter = lines.iter();
-    let mut line = iter.next().unwrap();
-
-    while !line.starts_with(" 1") {
-        let mut stack_index = 0;
-        let crate_str = line.get(stack_index..stack_index + 3).unwrap();
-        if crate_str.trim() != "" {
-            let crate_char = crate_str.chars().nth(1).unwrap();
-            stacks[stack_index].insert(0, crate_char);
-        }
-
-        stack_index = 1;
-        let mut str_index = 3;
-        while stack_index < stacks.len() {
-            let crate_str = line.get(str_index..str_index + 4).unwrap();
-            if crate_str.trim() != "" {
-                let crate_char = crate_str.chars().nth(2).unwrap();
-                stacks[stack_index].insert(0, crate_char);
-            }
-
-            stack_index += 1;
-            str_index += 4;
-        }
-
-        line = iter.next().unwrap();
-    }
-
-    // throw away empty line
-    iter.next();
+    populate_stacks(&mut stacks, stack_lines);
 
     // move crates around
-    for line in iter {
-        let mut line_split = line.split(" ");
-        let move_count: usize = line_split.nth(1).unwrap().parse().unwrap();
-        let stack_from: usize = line_split.nth(1).unwrap().parse().unwrap();
-        let stack_to: usize = line_split.nth(1).unwrap().parse().unwrap();
+    for command_line in command_lines {
+        let mut line_tokens = command_line.split(" ");
+        let move_count: usize = line_tokens.nth(1).unwrap().parse().unwrap();
+        let stack_from_index: usize = line_tokens.nth(1).unwrap().parse().unwrap();
+        let stack_to_index: usize = line_tokens.nth(1).unwrap().parse().unwrap();
 
         for _ in 0..move_count {
-            let value = stacks[stack_from - 1].pop().unwrap();
-            stacks[stack_to - 1].push(value);
+            let value = stacks[stack_from_index - 1].pop().unwrap();
+            stacks[stack_to_index - 1].push(value);
         }
     }
 
     // Grab top crate from each stack
-
     let mut result = String::new();
     for i in 0..stacks.len() {
-        result.push(stacks[i].pop().unwrap());
+        result.push_str(stacks[i].pop().unwrap().as_str());
     }
 
     return result;
 }
 
 pub fn solve_part_2(lines: &[String]) -> String {
-    let mut stacks = build_stacks(lines);
+    let (mut stacks, stack_lines, command_lines) = build_stacks(lines);
 
-    let mut iter = lines.iter();
-    let mut line = iter.next().unwrap();
-
-    // build_stacks
-    while !line.starts_with(" 1") {
-        let mut stack_index = 0;
-        let crate_str = line.get(stack_index..stack_index + 3).unwrap();
-        if crate_str.trim() != "" {
-            let crate_char = crate_str.chars().nth(1).unwrap();
-            stacks[stack_index].insert(0, crate_char);
-        }
-
-        stack_index = 1;
-        let mut str_index = 3;
-        while stack_index < stacks.len() {
-            let crate_str = line.get(str_index..str_index + 4).unwrap();
-            if crate_str.trim() != "" {
-                let crate_char = crate_str.chars().nth(2).unwrap();
-                stacks[stack_index].insert(0, crate_char);
-            }
-
-            stack_index += 1;
-            str_index += 4;
-        }
-
-        line = iter.next().unwrap();
-    }
-
-    // throw away empty line
-    iter.next();
+    populate_stacks(&mut stacks, stack_lines);
 
     // move crates around
-    for line in iter {
-        let mut line_split = line.split(" ");
-        let move_count: usize = line_split.nth(1).unwrap().parse().unwrap();
-        let stack_from_index: usize = line_split.nth(1).unwrap().parse().unwrap();
-        let stack_to_index: usize = line_split.nth(1).unwrap().parse().unwrap();
+    for command_line in command_lines {
+        let mut line_tokens = command_line.split(" ");
+        let move_count: usize = line_tokens.nth(1).unwrap().parse().unwrap();
+        let stack_from_index: usize = line_tokens.nth(1).unwrap().parse().unwrap();
+        let stack_to_index: usize = line_tokens.nth(1).unwrap().parse().unwrap();
 
         let mut temp_list = Vec::new();
 
@@ -117,10 +77,9 @@ pub fn solve_part_2(lines: &[String]) -> String {
     }
 
     // Grab top crate from each stack
-
     let mut result = String::new();
     for i in 0..stacks.len() {
-        result.push(stacks[i].pop().unwrap());
+        result.push_str(stacks[i].pop().unwrap().as_str());
     }
 
     return result;
