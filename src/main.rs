@@ -4,10 +4,10 @@ extern crate lazy_static;
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
- 
+
+mod utils;
 mod year2020;
 mod year2022;
-mod utils;
 
 macro_rules! solve {
     ($year:ident, $day:ident) => {
@@ -67,8 +67,9 @@ fn duration_with_colour(duration: Duration) -> String {
 
     format!("{:<20}", format!("\x1b[{}m{:?}\x1b[0m", color, duration))
 }
- 
+
 fn main() {
+    solve!(year2022, day4);
     solve!(year2022, day3);
     solve!(year2022, day2);
     solve!(year2022, day1);
