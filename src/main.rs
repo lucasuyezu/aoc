@@ -42,7 +42,7 @@ macro_rules! solve {
             let solve_duration = t1_instant.elapsed();
 
             println!(
-                "{} {} part1 read_file_duration={}\tsolve_duration={}\tresult={}",
+                "{} {} part1 read_file_duration={}\tsolve_duration={}\tresult={:?}",
                 stringify!($year),
                 stringify!($day),
                 duration_with_colour(read_file_duration),
@@ -69,6 +69,7 @@ fn duration_with_colour(duration: Duration) -> String {
 }
 
 fn main() {
+    solve!(year2022, day6);
     solve!(year2022, day5);
     solve!(year2022, day4);
     solve!(year2022, day3);
