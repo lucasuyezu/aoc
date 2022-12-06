@@ -22,32 +22,30 @@ macro_rules! solve {
         let lines_arc_t2 = lines_arc.clone();
         let t2 = thread::spawn(move || {
             let t2_instant = Instant::now();
-            let result = $year::$day::solve_part_2(&lines_arc_t2);
+            $year::$day::solve_part_2(&lines_arc_t2);
             let solve_duration = t2_instant.elapsed();
 
             println!(
-                "{} {} part2 read_file_duration={}\tsolve_duration={}\tresult={}",
+                "{} {} part2 read_file_duration={}\tsolve_duration={}",
                 stringify!($year),
                 stringify!($day),
                 duration_with_colour(read_file_duration),
-                duration_with_colour(solve_duration),
-                result
+                duration_with_colour(solve_duration)
             );
         });
 
         let lines_arc_t1 = lines_arc.clone();
         let t1 = thread::spawn(move || {
             let t1_instant = Instant::now();
-            let result = $year::$day::solve_part_1(&lines_arc_t1);
+            $year::$day::solve_part_1(&lines_arc_t1);
             let solve_duration = t1_instant.elapsed();
 
             println!(
-                "{} {} part1 read_file_duration={}\tsolve_duration={}\tresult={:?}",
+                "{} {} part1 read_file_duration={}\tsolve_duration={}",
                 stringify!($year),
                 stringify!($day),
                 duration_with_colour(read_file_duration),
                 duration_with_colour(solve_duration),
-                result,
             );
         });
 
