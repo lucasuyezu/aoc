@@ -1,8 +1,8 @@
-pub fn solve_part_1(lines: &[String]) -> usize {
+pub fn solve_part_1(input: &str) -> usize {
     let mut height_grid: Vec<Vec<u32>> = vec![];
     let mut visible_grid: Vec<Vec<bool>> = vec![];
 
-    for line in lines {
+    for line in input.lines() {
         height_grid.push(line.chars().map(|c| c.to_digit(10).unwrap()).collect());
         visible_grid.push(vec![false; line.len()]);
     }
@@ -27,11 +27,11 @@ pub fn solve_part_1(lines: &[String]) -> usize {
     return visible_grid.iter().flatten().filter(|cell| **cell).count();
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
+pub fn solve_part_2(input: &str) -> usize {
     let mut height_grid: Vec<Vec<u32>> = vec![];
     let mut scenic_score_grid: Vec<Vec<usize>> = vec![];
 
-    for line in lines {
+    for line in input.lines() {
         height_grid.push(line.chars().map(|c| c.to_digit(10).unwrap()).collect());
         scenic_score_grid.push(vec![0; line.len()]);
     }
@@ -97,37 +97,21 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 mod tests {
     #[test]
     fn part1_test_input() {
-        let lines: Vec<String> = include_str!("test_input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_1(&lines), 21);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 21);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines: Vec<String> = include_str!("input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_1(&lines), 1_713);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 1_713);
     }
 
     #[test]
     fn part2_test_input() {
-        let lines: Vec<String> = include_str!("test_input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_2(&lines), 8);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 8);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines: Vec<String> = include_str!("input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_2(&lines), 268_464);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 268_464);
     }
 }

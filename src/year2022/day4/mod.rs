@@ -1,6 +1,6 @@
-pub fn solve_part_1(lines: &[String]) -> usize {
-    return lines
-        .iter()
+pub fn solve_part_1(input: &str) -> usize {
+    return input
+        .lines()
         .filter(|line| {
             let mut elf_strings = line.split(",");
 
@@ -20,9 +20,9 @@ pub fn solve_part_1(lines: &[String]) -> usize {
         .count();
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    return lines
-        .iter()
+pub fn solve_part_2(input: &str) -> usize {
+    return input
+        .lines()
         .filter(|line| {
             let mut elf_strings = line.split(",");
 
@@ -43,37 +43,23 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day4/test_input".to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 2);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 2);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day4/input".to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 450);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 450);
     }
 
     #[test]
     fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day4/test_input".to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 4);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 4);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day4/input".to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 837);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 837);
     }
 }

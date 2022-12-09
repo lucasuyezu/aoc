@@ -39,8 +39,8 @@ impl Rope {
         return rope;
     }
 
-    fn execute_moves(&mut self, lines: &[String]) {
-        for line in lines {
+    fn execute_moves(&mut self, input: &str) {
+        for line in input.lines() {
             let (direction, steps) = line.split_once(" ").unwrap();
             self.execute_move(direction, steps.parse::<usize>().unwrap());
         }
@@ -132,16 +132,16 @@ impl Rope {
     }
 }
 
-pub fn solve_part_1(lines: &[String]) -> usize {
+pub fn solve_part_1(input: &str) -> usize {
     let mut rope = Rope::new(2);
-    rope.execute_moves(lines);
+    rope.execute_moves(input);
 
     return rope.tail_positions_visited.len();
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
+pub fn solve_part_2(input: &str) -> usize {
     let mut rope = Rope::new(10);
-    rope.execute_moves(lines);
+    rope.execute_moves(input);
 
     return rope.tail_positions_visited.len();
 }
@@ -150,46 +150,26 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 mod tests {
     #[test]
     fn part1_test_input() {
-        let lines: Vec<String> = include_str!("test_input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_1(&lines), 13);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 13);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines: Vec<String> = include_str!("input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_1(&lines), 6_367);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 6_367);
     }
 
     #[test]
     fn part2_test_input_1() {
-        let lines: Vec<String> = include_str!("test_input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_2(&lines), 1);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 1);
     }
 
     #[test]
     fn part2_test_input_2() {
-        let lines: Vec<String> = include_str!("test_input_2")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_2(&lines), 36);
+        assert_eq!(super::solve_part_2(&include_str!("test_input_2")), 36);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines: Vec<String> = include_str!("input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_2(&lines), 2_536);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 2_536);
     }
 }

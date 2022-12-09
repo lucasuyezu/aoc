@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 
+use std::fs;
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
@@ -9,7 +10,7 @@ mod utils;
 mod year2020;
 mod year2022;
 
-macro_rules! solve {
+macro_rules! solve_string {
     ($year:ident, $day:ident) => {
         let now = Instant::now();
         let lines_arc = Arc::new(utils::get_lines(format!(
@@ -54,6 +55,43 @@ macro_rules! solve {
     };
 }
 
+macro_rules! solve_str {
+    ($year:ident, $day:ident) => {
+        let now = Instant::now();
+        let lines = fs::read_to_string(format!(
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
+            stringify!($year),
+            stringify!($day)
+        ))
+        .unwrap();
+        let read_file_duration = now.elapsed();
+
+        let t2_instant = Instant::now();
+        $year::$day::solve_part_2(&lines);
+        let solve_duration = t2_instant.elapsed();
+
+        println!(
+            "{} {} part2 read_file_duration={}\tsolve_duration={}",
+            stringify!($year),
+            stringify!($day),
+            duration_with_colour(read_file_duration),
+            duration_with_colour(solve_duration)
+        );
+
+        let t1_instant = Instant::now();
+        $year::$day::solve_part_1(&lines);
+        let solve_duration = t1_instant.elapsed();
+
+        println!(
+            "{} {} part1 read_file_duration={}\tsolve_duration={}",
+            stringify!($year),
+            stringify!($day),
+            duration_with_colour(read_file_duration),
+            duration_with_colour(solve_duration),
+        );
+    };
+}
+
 fn duration_with_colour(duration: Duration) -> String {
     let color = if duration.as_micros() < 10 {
         92
@@ -67,22 +105,22 @@ fn duration_with_colour(duration: Duration) -> String {
 }
 
 fn main() {
-    solve!(year2022, day9);
-    solve!(year2022, day8);
-    solve!(year2022, day7);
-    solve!(year2022, day6);
-    solve!(year2022, day5);
-    solve!(year2022, day4);
-    solve!(year2022, day3);
-    solve!(year2022, day2);
-    solve!(year2022, day1);
-    solve!(year2020, day9);
-    solve!(year2020, day8);
-    solve!(year2020, day7);
-    solve!(year2020, day6);
-    solve!(year2020, day5);
-    solve!(year2020, day4);
-    solve!(year2020, day3);
-    solve!(year2020, day2);
-    solve!(year2020, day1);
+    solve_str!(year2022, day9);
+    solve_str!(year2022, day8);
+    solve_str!(year2022, day7);
+    solve_str!(year2022, day6);
+    solve_string!(year2022, day5);
+    solve_str!(year2022, day4);
+    solve_string!(year2022, day3);
+    solve_string!(year2022, day2);
+    solve_string!(year2022, day1);
+    solve_string!(year2020, day9);
+    solve_string!(year2020, day8);
+    solve_string!(year2020, day7);
+    solve_string!(year2020, day6);
+    solve_string!(year2020, day5);
+    solve_string!(year2020, day4);
+    solve_string!(year2020, day3);
+    solve_string!(year2020, day2);
+    solve_string!(year2020, day1);
 }

@@ -201,8 +201,7 @@ mod tests {
     #[test]
     fn part1_real_input() {
         let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/input"
-                .to_string(),
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/input".to_string(),
         );
         assert_eq!(super::solve_part_1(&lines), 190);
     }
@@ -219,8 +218,7 @@ mod tests {
     #[test]
     fn part2_real_input() {
         let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/input"
-                .to_string(),
+            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/input".to_string(),
         );
         assert_eq!(super::solve_part_2(&lines), 121);
     }

@@ -71,11 +71,11 @@ impl Tree {
     }
 }
 
-fn build_tree(lines: &[String]) -> Tree {
+fn build_tree(input: &str) -> Tree {
     let mut tree = Tree::new();
     let file_regex = Regex::new(r"^(\d+)\s(.+)$").unwrap();
 
-    lines.iter().for_each(|line| {
+    input.lines().for_each(|line| {
         if line == "$ cd .." {
             tree.cd_up();
         } else if line.starts_with("$ cd") {
@@ -90,8 +90,8 @@ fn build_tree(lines: &[String]) -> Tree {
 
     return tree;
 }
-pub fn solve_part_1(lines: &[String]) -> usize {
-    let tree = build_tree(lines);
+pub fn solve_part_1(input: &str) -> usize {
+    let tree = build_tree(input);
 
     return tree
         .directories
@@ -101,8 +101,8 @@ pub fn solve_part_1(lines: &[String]) -> usize {
         .sum();
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    let tree = build_tree(lines);
+pub fn solve_part_2(input: &str) -> usize {
+    let tree = build_tree(input);
     let root_dir_size = tree.directories.get("/").unwrap().size;
 
     return tree
@@ -124,37 +124,21 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 mod tests {
     #[test]
     fn part1_test_input() {
-        let lines: Vec<String> = include_str!("test_input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_1(&lines), 95_437);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 95_437);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines: Vec<String> = include_str!("input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_1(&lines), 1_206_825);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 1_206_825);
     }
 
     #[test]
     fn part2_test_input() {
-        let lines: Vec<String> = include_str!("test_input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_2(&lines), 24_933_642);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 24_933_642);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines: Vec<String> = include_str!("input")
-            .lines()
-            .map(|str| str.to_string())
-            .collect();
-        assert_eq!(super::solve_part_2(&lines), 9_608_311);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 9_608_311);
     }
 }
