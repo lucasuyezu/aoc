@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 
 mod utils;
 mod year2020;
+mod year2021;
 mod year2022;
 
 macro_rules! solve_string {
@@ -114,6 +115,7 @@ fn main() {
     solve_string!(year2022, day3);
     solve_string!(year2022, day2);
     solve_string!(year2022, day1);
+    solve_str!(year2021, day1);
     solve_string!(year2020, day9);
     solve_string!(year2020, day8);
     solve_string!(year2020, day7);
