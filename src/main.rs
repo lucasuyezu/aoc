@@ -106,6 +106,7 @@ fn duration_with_colour(duration: Duration) -> String {
 }
 
 fn main() {
+    solve_str!(year2022, day10);
     solve_str!(year2022, day9);
     solve_str!(year2022, day8);
     solve_str!(year2022, day7);
