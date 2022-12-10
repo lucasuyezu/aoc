@@ -3,8 +3,6 @@ pub fn solve_part_1(input: &str) -> usize {
         .lines()
         .map(|line| line.parse::<usize>().unwrap())
         .collect::<Vec<usize>>()
-        .iter()
-        .as_slice()
         .windows(2)
         .filter(|values| values[1] > values[0])
         .count();
@@ -15,13 +13,9 @@ pub fn solve_part_2(input: &str) -> usize {
         .lines()
         .map(|line| line.parse::<usize>().unwrap())
         .collect::<Vec<usize>>()
-        .iter()
-        .as_slice()
         .windows(3)
         .map(|values| values[0] + values[1] + values[2])
         .collect::<Vec<usize>>()
-        .iter()
-        .as_slice()
         .windows(2)
         .filter(|values| values[1] > values[0])
         .count();
