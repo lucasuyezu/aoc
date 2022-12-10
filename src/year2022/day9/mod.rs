@@ -6,23 +6,6 @@ struct Position {
     y: isize,
 }
 
-impl Position {
-    fn move_right(&mut self) {
-        self.x += 1;
-    }
-
-    fn move_left(&mut self) {
-        self.x -= 1;
-    }
-
-    fn move_up(&mut self) {
-        self.y += 1;
-    }
-    fn move_down(&mut self) {
-        self.y -= 1;
-    }
-}
-
 struct Rope {
     knots: Vec<Position>,
     tail_positions_visited: HashSet<String>,
@@ -49,10 +32,10 @@ impl Rope {
     fn execute_move(&mut self, direction: &str, steps: usize) {
         for _ in 0..steps {
             match direction {
-                "R" => self.knots[0].move_right(),
-                "U" => self.knots[0].move_up(),
-                "D" => self.knots[0].move_down(),
-                "L" => self.knots[0].move_left(),
+                "R" => self.knots[0].x += 1,
+                "U" => self.knots[0].y += 1,
+                "D" => self.knots[0].y -= 1,
+                "L" => self.knots[0].x -= 1,
                 _ => {
                     panic!("\tInvalid step direction! {}", direction);
                 }
@@ -79,52 +62,13 @@ impl Rope {
             return;
         }
 
-        if x_distance == 2 && y_distance == 0 {
-            tail.move_right();
-        }
-
-        if x_distance == -2 && y_distance == 0 {
-            tail.move_left();
-        }
-
-        if x_distance == 0 && y_distance == 2 {
-            tail.move_up();
-        }
-
-        if x_distance == 0 && y_distance == -2 {
-            tail.move_down();
-        }
-
-        if x_distance == 1 && y_distance == 2
-            || x_distance == 2 && y_distance == 1
-            || x_distance == 2 && y_distance == 2
-        {
-            tail.move_right();
-            tail.move_up();
-        }
-
-        if x_distance == -2 && y_distance == 1
-            || x_distance == -1 && y_distance == 2
-            || x_distance == -2 && y_distance == 2
-        {
-            tail.move_left();
-            tail.move_up();
-        }
-
-        if x_distance == 2 && y_distance == -1
-            || x_distance == 1 && y_distance == -2
-            || x_distance == 2 && y_distance == -2
-        {
-            tail.move_down();
-            tail.move_right();
-        }
-
-        if x_distance == -2 && y_distance == -1
-            || x_distance == -1 && y_distance == -2
-            || x_distance == -2 && y_distance == -2
-        {
-            tail.move_down();
-            tail.move_left();
+        if x_distance == 0 {
+            tail.y += if y_distance < 0 { -1 } else { 1 };
+        } else if y_distance == 0 {
+            tail.x += if x_distance < 0 { -1 } else { 1 };
+        } else {
+            tail.x += if x_distance < 0 { -1 } else { 1 };
+            tail.y += if y_distance < 0 { -1 } else { 1 };
         }
 
         assert!((head.x - tail.x).abs() < 2);
