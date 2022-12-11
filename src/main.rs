@@ -7,6 +7,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 mod utils;
+mod year2015;
 mod year2020;
 mod year2021;
 mod year2022;
@@ -127,4 +128,5 @@ fn main() {
     solve_string!(year2020, day3);
     solve_string!(year2020, day2);
     solve_string!(year2020, day1);
+    solve_str!(year2015, day1);
 }
