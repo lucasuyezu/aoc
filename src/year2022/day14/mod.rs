@@ -1,6 +1,8 @@
 use core::time;
 use std::{collections::HashMap, io, thread};
 
+use crate::utils::get_timer_millis;
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 struct Point {
     x: usize,
@@ -96,7 +98,12 @@ impl Grid {
         self.stuff_hash.insert(cur_point, "o".to_string());
 
         loop {
-            // self.print_frame();
+            if let Some(timer_millis) = get_timer_millis() {
+                self.print_frame();
+
+                let timer = time::Duration::from_millis(timer_millis);
+                thread::sleep(timer);
+            }
 
             match self.move_sand(&cur_point) {
                 Some(new_point) => {
@@ -186,9 +193,6 @@ impl Grid {
         }
 
         println!("{}", frame);
-
-        let timer = time::Duration::from_millis(60);
-        thread::sleep(timer);
     }
 }
 
