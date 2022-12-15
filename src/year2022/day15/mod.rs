@@ -20,8 +20,6 @@ struct Grid {
     sensors: HashSet<Point>,
     min_x: isize,
     max_x: isize,
-    min_y: isize,
-    max_y: isize,
     target_y: isize,
 }
 
@@ -31,9 +29,7 @@ fn dist(point_a: &Point, point_b: &Point) -> usize {
 impl Grid {
     fn from(input: &str, target_y: isize) -> Grid {
         let mut min_x = isize::MAX;
-        let mut min_y = isize::MAX;
         let mut max_x = isize::MIN;
-        let mut max_y = isize::MIN;
 
         let mut sensors: HashSet<Point> = HashSet::new();
         let mut beacons: HashSet<Point> = HashSet::new();
@@ -73,20 +69,12 @@ impl Grid {
             .collect();
 
         pairs.iter().for_each(|pair| {
-            if pair.sensor.x < min_x {
-                min_x = pair.sensor.x;
+            if (pair.sensor.x - pair.distance as isize) < min_x {
+                min_x = pair.sensor.x - pair.distance as isize;
             }
 
-            if pair.sensor.x > max_x {
-                max_x = pair.sensor.x;
-            }
-
-            if pair.sensor.y < min_y {
-                min_y = pair.sensor.y;
-            }
-
-            if pair.sensor.y > max_y {
-                max_y = pair.sensor.y;
+            if (pair.sensor.x + pair.distance as isize) > max_x {
+                max_x = pair.sensor.x + pair.distance as isize;
             }
 
             if pair.beacon.x < min_x {
@@ -96,22 +84,12 @@ impl Grid {
             if pair.beacon.x > max_x {
                 max_x = pair.beacon.x;
             }
-
-            if pair.beacon.y < min_y {
-                min_y = pair.beacon.y;
-            }
-
-            if pair.beacon.y > max_y {
-                max_y = pair.beacon.y;
-            }
         });
 
         Grid {
             pairs,
             min_x,
             max_x,
-            min_y,
-            max_y,
             target_y,
             beacons,
             sensors,
@@ -168,9 +146,10 @@ mod tests {
 
     #[test]
     fn part1_real_input() {
-        // assert_eq!(super::solve_part_1(&include_str!("input"), 2000000), 4_299_549);
-        // 4_299_549 is too low!
-        assert_eq!(super::solve_part_1(&include_str!("input"), 2000000), 0);
+        assert_eq!(
+            super::solve_part_1(&include_str!("input"), 2000000),
+            4665948
+        );
     }
 
     #[test]
