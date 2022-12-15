@@ -1,5 +1,5 @@
 use core::time;
-use std::{collections::HashMap, thread};
+use std::{collections::HashMap, io, thread};
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 struct Point {
@@ -96,7 +96,7 @@ impl Grid {
         self.stuff_hash.insert(cur_point, "o".to_string());
 
         loop {
-             // self.print_frame();
+            // self.print_frame();
 
             match self.move_sand(&cur_point) {
                 Some(new_point) => {
@@ -160,29 +160,32 @@ impl Grid {
 
     fn print_frame(&self) {
         // Clear screen
-        print!("{}[2J", 27 as char);
+        println!("{}[2J", 27 as char);
+        let mut frame = String::new();
 
         for y in 0..=self.max_y {
-            print!(" {:>3}", y);
+            frame.push_str(&format!(" {:>3}", y));
 
             if y == self.max_y {
-                print!("~");
+                frame.push('~');
             } else {
-                print!(" ");
+                frame.push(' ');
             }
 
             for x in (self.min_x - 1)..=(self.max_x + 1) {
                 let point = Point { x, y };
                 if let Some(stuff) = self.stuff_hash.get(&point) {
-                    print!("{}", stuff);
+                    frame.push_str(stuff);
                 } else if point == SAND_UNIT_ORIGIN {
-                    print!("+");
+                    frame.push('+');
                 } else {
-                    print!(".");
+                    frame.push('.');
                 }
             }
-            println!();
+            frame.push('\n');
         }
+
+        println!("{}", frame);
 
         let timer = time::Duration::from_millis(60);
         thread::sleep(timer);
