@@ -143,10 +143,7 @@ pub fn solve_part_2(input: &str) -> usize {
     let mut results: Vec<usize> = starting_positions
         .iter()
         .map(|starting_position| {
-            println!("Solving for {:?}", starting_position);
-
             if let Some(result) = graph.solve(&starting_position, &end_vertex) {
-                println!("\tResult is {}", result);
                 result
             } else {
                 usize::max_value()
