@@ -68,18 +68,6 @@ macro_rules! solve_str {
         .unwrap();
         let read_file_duration = now.elapsed();
 
-        let t2_instant = Instant::now();
-        $year::$day::solve_part_2(&lines);
-        let solve_duration = t2_instant.elapsed();
-
-        println!(
-            "{} {} part2 read_file_duration={}\tsolve_duration={}",
-            stringify!($year),
-            stringify!($day),
-            duration_with_colour(read_file_duration),
-            duration_with_colour(solve_duration)
-        );
-
         let t1_instant = Instant::now();
         $year::$day::solve_part_1(&lines);
         let solve_duration = t1_instant.elapsed();
@@ -90,6 +78,18 @@ macro_rules! solve_str {
             stringify!($day),
             duration_with_colour(read_file_duration),
             duration_with_colour(solve_duration),
+        );
+
+        let t2_instant = Instant::now();
+        $year::$day::solve_part_2(&lines);
+        let solve_duration = t2_instant.elapsed();
+
+        println!(
+            "{} {} part2 read_file_duration={}\tsolve_duration={}",
+            stringify!($year),
+            stringify!($day),
+            duration_with_colour(read_file_duration),
+            duration_with_colour(solve_duration)
         );
     };
 }
