@@ -1,7 +1,7 @@
-pub fn solve_part_1(lines: &[String]) -> usize {
+pub fn solve_part_1(input: &str) -> usize {
     let mut acc = 0;
     let mut max = 0;
-    for line in lines.iter() {
+    for line in input.lines() {
         if line != "" {
             acc += line.parse::<usize>().unwrap();
         }
@@ -20,10 +20,10 @@ pub fn solve_part_1(lines: &[String]) -> usize {
     return max;
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
+pub fn solve_part_2(input: &str) -> usize {
     let mut vec: Vec<usize> = Vec::new();
     let mut acc = 0;
-    for line in lines.iter() {
+    for line in input.lines() {
         if line != "" {
             acc += line.parse::<usize>().unwrap();
         }
@@ -42,41 +42,23 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day1/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 24_000);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 24_000);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day1/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 69_883);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 69_883);
     }
 
     #[test]
     fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day1/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 45_000);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 45_000);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day1/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 207_576);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 207_576);
     }
 }
