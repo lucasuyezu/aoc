@@ -51,10 +51,10 @@ impl BoardingPass<'_> {
     }
 }
 
-pub fn solve_part_1(lines: &[String]) -> usize {
+pub fn solve_part_1(input: &str) -> usize {
     let mut highest_seat_id = 0;
 
-    for line in lines {
+    for line in input.lines() {
         let boarding_pass = BoardingPass { string: line };
         let seat = Seat {
             row_id: boarding_pass.row_id(),
@@ -71,12 +71,12 @@ pub fn solve_part_1(lines: &[String]) -> usize {
     highest_seat_id
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
+pub fn solve_part_2(input: &str) -> usize {
     // create set to store all seats, based on row_id + column_id
     let mut seats = HashSet::new();
     let mut current_seat: Seat;
 
-    for line in lines {
+    for line in input.lines() {
         let boarding_pass = BoardingPass { string: line };
         let seat = Seat {
             row_id: boarding_pass.row_id(),
@@ -114,29 +114,17 @@ mod tests {
 
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day5/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 820);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 820);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day5/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 864);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 864);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day5/input"
-                .to_string(),
-        );
-        let result = super::solve_part_2(&lines);
+        let result = super::solve_part_2(&include_str!("input"));
         assert_ne!(result, 0);
         assert_ne!(result, 8);
     }
