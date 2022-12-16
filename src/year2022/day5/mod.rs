@@ -1,4 +1,8 @@
-fn build_stacks(lines: &[String]) -> (Vec<Vec<String>>, &[String], &[String]) {
+fn build_stacks(input: &str) -> (Vec<Vec<String>>, Vec<String>, Vec<String>) {
+    let lines = input
+        .lines()
+        .map(|line| line.to_string())
+        .collect::<Vec<String>>();
     let mut lines_split = lines.split(|line| line == "");
     let (stack_count_line, stack_lines) = lines_split.next().unwrap().split_last().unwrap();
     let command_lines = lines_split.next().unwrap();
@@ -11,10 +15,14 @@ fn build_stacks(lines: &[String]) -> (Vec<Vec<String>>, &[String], &[String]) {
         .parse()
         .unwrap();
 
-    return (vec![Vec::new(); stack_count], stack_lines, command_lines);
+    return (
+        vec![Vec::new(); stack_count],
+        stack_lines.to_owned(),
+        command_lines.to_owned(),
+    );
 }
 
-fn populate_stacks(stacks: &mut Vec<Vec<String>>, stack_lines: &[String]) {
+fn populate_stacks(stacks: &mut Vec<Vec<String>>, stack_lines: Vec<String>) {
     for stack_line in stack_lines {
         let mut str_index = 1;
         for stack in stacks.iter_mut() {
@@ -27,8 +35,8 @@ fn populate_stacks(stacks: &mut Vec<Vec<String>>, stack_lines: &[String]) {
     }
 }
 
-pub fn solve_part_1(lines: &[String]) -> String {
-    let (mut stacks, stack_lines, command_lines) = build_stacks(lines);
+pub fn solve_part_1(input: &str) -> String {
+    let (mut stacks, stack_lines, command_lines) = build_stacks(input);
 
     populate_stacks(&mut stacks, stack_lines);
 
@@ -54,8 +62,8 @@ pub fn solve_part_1(lines: &[String]) -> String {
     return result;
 }
 
-pub fn solve_part_2(lines: &[String]) -> String {
-    let (mut stacks, stack_lines, command_lines) = build_stacks(lines);
+pub fn solve_part_2(input: &str) -> String {
+    let (mut stacks, stack_lines, command_lines) = build_stacks(input);
 
     populate_stacks(&mut stacks, stack_lines);
 
@@ -87,37 +95,23 @@ pub fn solve_part_2(lines: &[String]) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day5/test_input".to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), "CMZ");
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), "CMZ");
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day5/input".to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), "CVCWCRTVQ");
+        assert_eq!(super::solve_part_1(&include_str!("input")), "CVCWCRTVQ");
     }
 
     #[test]
     fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day5/test_input".to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), "MCD");
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), "MCD");
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day5/input".to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), "CNSCZWLVT");
+        assert_eq!(super::solve_part_2(&include_str!("input")), "CNSCZWLVT");
     }
 }

@@ -2,8 +2,6 @@
 extern crate lazy_static;
 
 use std::fs;
-use std::sync::Arc;
-use std::thread;
 use std::time::{Duration, Instant};
 
 mod utils;
@@ -11,51 +9,6 @@ mod year2015;
 mod year2020;
 mod year2021;
 mod year2022;
-
-macro_rules! solve_string {
-    ($year:ident, $day:ident) => {
-        let now = Instant::now();
-        let lines_arc = Arc::new(utils::get_lines(format!(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
-            stringify!($year),
-            stringify!($day)
-        )));
-        let read_file_duration = now.elapsed();
-
-        let lines_arc_t2 = lines_arc.clone();
-        let t2 = thread::spawn(move || {
-            let t2_instant = Instant::now();
-            $year::$day::solve_part_2(&lines_arc_t2);
-            let solve_duration = t2_instant.elapsed();
-
-            println!(
-                "{} {} part2 read_file_duration={}\tsolve_duration={}",
-                stringify!($year),
-                stringify!($day),
-                duration_with_colour(read_file_duration),
-                duration_with_colour(solve_duration)
-            );
-        });
-
-        let lines_arc_t1 = lines_arc.clone();
-        let t1 = thread::spawn(move || {
-            let t1_instant = Instant::now();
-            $year::$day::solve_part_1(&lines_arc_t1);
-            let solve_duration = t1_instant.elapsed();
-
-            println!(
-                "{} {} part1 read_file_duration={}\tsolve_duration={}",
-                stringify!($year),
-                stringify!($day),
-                duration_with_colour(read_file_duration),
-                duration_with_colour(solve_duration),
-            );
-        });
-
-        t2.join().expect("$year $day part2 has panicked!");
-        t1.join().expect("$year $day part1 has panicked!");
-    };
-}
 
 macro_rules! solve_str {
     ($year:ident, $day:ident) => {
@@ -117,7 +70,7 @@ fn main() {
     solve_str!(year2022, day8);
     solve_str!(year2022, day7);
     solve_str!(year2022, day6);
-    solve_string!(year2022, day5);
+    solve_str!(year2022, day5);
     solve_str!(year2022, day4);
     solve_str!(year2022, day3);
     solve_str!(year2022, day2);
