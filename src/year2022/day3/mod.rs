@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
-pub fn solve_part_1(lines: &[String]) -> usize {
-    return lines
-        .iter()
+pub fn solve_part_1(input: &str) -> usize {
+    return input
+        .lines()
         .map(|it| (it.split_at(it.len()/2)))
         .map(|it| {
             let a: HashSet<char> = it.0.chars().into_iter().collect();
@@ -22,8 +22,11 @@ pub fn solve_part_1(lines: &[String]) -> usize {
         .sum();
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    return lines
+pub fn solve_part_2(input: &str) -> usize {
+    return input
+        .lines()
+        .collect::<Vec<&str>>()
+        .as_slice()
         .chunks(3)
         .map(|chunk| {
             let a: HashSet<char> = chunk[0].chars().into_iter().collect();
@@ -47,41 +50,23 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day3/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 157);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 157);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day3/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 8_018);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 8_018);
     }
 
     #[test]
     fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day3/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 70);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 70);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day3/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 2_518);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 2_518);
     }
 }
