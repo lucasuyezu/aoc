@@ -89,15 +89,15 @@ impl Passport {
     }
 }
 
-pub fn solve_part_1(lines: &[String]) -> usize {
-    solve(lines, "part1")
+pub fn solve_part_1(input: &str) -> usize {
+    solve(input, "part1")
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    solve(lines, "part2")
+pub fn solve_part_2(input: &str) -> usize {
+    solve(input, "part2")
 }
 
-fn solve(passport_lines: &[String], part: &str) -> usize {
+fn solve(passport_input: &str, part: &str) -> usize {
     let mut valid_passport_count = 0;
 
     let mut passport = Passport {
@@ -113,10 +113,10 @@ fn solve(passport_lines: &[String], part: &str) -> usize {
     };
 
     // Build passports
-    for passport_line in passport_lines {
+    for passport_line in passport_input.lines() {
         // println!("passport_line={}", passport_line);
 
-        if passport_line.as_str().is_empty() {
+        if passport_line.is_empty() {
             if part == "part1" && passport.is_valid_part_1() {
                 valid_passport_count += 1;
             }
@@ -187,39 +187,23 @@ fn solve(passport_lines: &[String], part: &str) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/test_input_part_1"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 2);
+        assert_eq!(super::solve_part_1(&include_str!("test_input_part_1")), 2);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/input".to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 190);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 190);
     }
 
     #[test]
     fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/test_input_part_2"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 4);
+        assert_eq!(super::solve_part_2(&include_str!("test_input_part_2")), 4);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day4/input".to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 121);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 121);
     }
 }
