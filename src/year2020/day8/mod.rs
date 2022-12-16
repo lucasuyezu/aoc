@@ -29,10 +29,10 @@ impl Instruction {
     }
 }
 
-fn build_instructions(lines: &[String]) -> Vec<Instruction> {
+fn build_instructions(input: &str) -> Vec<Instruction> {
     let mut instructions = Vec::<Instruction>::new();
 
-    for line in lines {
+    for line in input.lines() {
         let opcode = match &line[0..3] {
             "nop" => OpCode::Nop,
             "acc" => OpCode::Acc,
@@ -77,8 +77,8 @@ fn execute_program(instructions: &[Instruction]) -> Result<isize, isize> {
     Ok(acc)
 }
 
-pub fn solve_part_1(lines: &[String]) -> isize {
-    let instructions = build_instructions(lines);
+pub fn solve_part_1(input: &str) -> isize {
+    let instructions = build_instructions(input);
 
     if let Err(acc) = execute_program(&instructions) {
         return acc;
@@ -87,8 +87,8 @@ pub fn solve_part_1(lines: &[String]) -> isize {
     panic!("Part 1 never finishes!")
 }
 
-pub fn solve_part_2(lines: &[String]) -> isize {
-    let instructions = build_instructions(lines);
+pub fn solve_part_2(input: &str) -> isize {
+    let instructions = build_instructions(input);
 
     for i in 0..instructions.len() {
         let mut program = instructions.clone();
@@ -116,41 +116,23 @@ pub fn solve_part_2(lines: &[String]) -> isize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day8/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 5);
-    }
-
-    #[test]
-    fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day8/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 8);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 5);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day8/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 1801);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 1801);
+    }
+
+    #[test]
+    fn part2_test_input() {
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 8);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day8/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 2060);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 2060);
     }
 }
