@@ -36,14 +36,14 @@ impl SlopeMap {
     }
 }
 
-pub fn solve_part_1(lines: &[String]) -> usize {
-    let slope_map = get_structs(lines);
+pub fn solve_part_1(input: &str) -> usize {
+    let slope_map = parse_input(input);
 
     slope_map.traverse(3, 1)
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    let slope_map = get_structs(lines);
+pub fn solve_part_2(input: &str) -> usize {
+    let slope_map = parse_input(input);
 
     let result_1 = slope_map.traverse(1, 1);
     let result_2 = slope_map.traverse(3, 1);
@@ -54,9 +54,9 @@ pub fn solve_part_2(lines: &[String]) -> usize {
     result_1 * result_2 * result_3 * result_4 * result_5
 }
 
-fn get_structs(lines: &[String]) -> SlopeMap {
+fn parse_input(input: &str) -> SlopeMap {
     SlopeMap {
-        map: lines.to_vec(),
+        map: input.lines().map(|line| line.to_string()).collect(),
     }
 }
 
@@ -66,37 +66,21 @@ mod tests {
 
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 7);
-    }
-
-    #[test]
-    fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day3/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 336);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 7);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day3/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 164);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 164);
+    }
+
+    #[test]
+    fn part2_test_input() {
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 336);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day3/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 5007658656);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 5007658656);
     }
 }

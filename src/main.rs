@@ -130,7 +130,7 @@ fn main() {
     solve_string!(year2020, day6);
     solve_string!(year2020, day5);
     solve_string!(year2020, day4);
-    solve_string!(year2020, day3);
+    solve_str!(year2020, day3);
     solve_str!(year2020, day2);
     solve_str!(year2020, day1);
     solve_str!(year2015, day1);
