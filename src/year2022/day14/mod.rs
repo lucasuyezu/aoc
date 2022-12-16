@@ -1,20 +1,15 @@
 use core::time;
 use std::{collections::HashMap, thread};
 
+use crate::utils::point::Point;
 use crate::utils::get_timer_millis;
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-struct Point {
-    x: usize,
-    y: usize,
-}
 
 #[derive(Debug)]
 struct Grid {
     stuff_hash: HashMap<Point, String>,
-    min_x: usize,
-    max_x: usize,
-    max_y: usize,
+    min_x: isize,
+    max_x: isize,
+    max_y: isize,
 }
 
 const SAND_UNIT_ORIGIN: Point = Point { x: 500, y: 0 };
@@ -22,10 +17,10 @@ const SAND_UNIT_ORIGIN: Point = Point { x: 500, y: 0 };
 impl Grid {
     fn from(input: &str, has_floor: bool) -> Grid {
         let mut stuff_hash: HashMap<Point, String> = HashMap::new();
-        let mut min_x = usize::MAX;
-        let mut min_y = usize::MAX;
-        let mut max_x = usize::MIN;
-        let mut max_y = usize::MIN;
+        let mut min_x = isize::MAX;
+        let mut min_y = isize::MAX;
+        let mut max_x = isize::MIN;
+        let mut max_y = isize::MIN;
 
         let shapes: Vec<Vec<Point>> = input
             .lines()

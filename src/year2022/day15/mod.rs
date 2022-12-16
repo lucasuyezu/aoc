@@ -1,10 +1,5 @@
+use super::super::utils::point::Point;
 use std::collections::HashSet;
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Copy)]
-pub struct Point {
-    x: isize,
-    y: isize,
-}
 
 #[derive(Debug)]
 struct Pair {
@@ -19,10 +14,6 @@ struct Grid {
     beacons: HashSet<Point>,
     min_x: isize,
     max_x: isize,
-}
-
-fn dist(point_a: &Point, point_b: &Point) -> usize {
-    (point_a.x - point_b.x).abs() as usize + (point_a.y - point_b.y).abs() as usize
 }
 
 impl Grid {
@@ -53,7 +44,7 @@ impl Grid {
                     y: beacon_y,
                 };
 
-                let distance = dist(&sensor, &beacon);
+                let distance = sensor.manhattan_distance(&beacon);
 
                 beacons.insert(beacon);
 
@@ -91,25 +82,42 @@ impl Grid {
         }
     }
 
-    fn row_count(&self, target_y: isize) -> usize {
-        let mut point = Point {
-            y: target_y,
-            x: self.min_x,
-        };
+    fn row_count(&self, y: isize) -> usize {
         let mut count = 0;
-        for x in self.min_x..=self.max_x {
-            point.x = x;
+        let mut x = self.min_x;
+        while x <= self.max_x {
+            let point = Point { x, y };
 
             // If I'm a beacon, skip me
             if self.beacons.contains(&point) {
+                x += 1;
                 continue;
+            }
+
+            if let Some(pair) = self
+                .pairs
+                .iter()
+                .find(|pair| point.manhattan_distance(&pair.sensor) <= pair.distance)
+            {
+                let point_to_sensor = point.manhattan_distance(&pair.sensor);
+                let skip_steps: usize = pair.distance - point_to_sensor;
+
+                count += skip_steps;
+                x += 1 + skip_steps as isize;
+                if x > self.max_x {
+                    break;
+                } else {
+                    continue;
+                }
+            } else {
+                return count;
             }
 
             // If I'm within range of *any* sensor-beacon pair, count me
             if self
                 .pairs
                 .iter()
-                .any(|pair| dist(&point, &pair.sensor) <= pair.distance)
+                .any(|pair| point.manhattan_distance(&pair.sensor) <= pair.distance)
             {
                 count += 1;
             }
@@ -139,9 +147,9 @@ impl Grid {
                 if let Some(pair) = self
                     .pairs
                     .iter()
-                    .find(|pair| dist(&point, &pair.sensor) <= pair.distance)
+                    .find(|pair| point.manhattan_distance(&pair.sensor) <= pair.distance)
                 {
-                    let point_to_sensor = dist(&point, &pair.sensor);
+                    let point_to_sensor = point.manhattan_distance(&pair.sensor);
                     let skip_steps: usize = pair.distance - point_to_sensor;
 
                     y += 1 + skip_steps as isize;
