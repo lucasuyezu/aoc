@@ -1,15 +1,13 @@
-pub fn solve_part_1(lines: &[String]) -> usize {
-    let numbers: Vec<usize> = lines
-        .iter()
+pub fn solve_part_1(input: &str) -> usize {
+    let numbers: Vec<usize> = input.lines()
         .map(|line| line.parse::<usize>().unwrap())
         .collect();
 
     invalid_number(&numbers, 25)
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    let numbers: Vec<usize> = lines
-        .iter()
+pub fn solve_part_2(input: &str) -> usize {
+    let numbers: Vec<usize> = input.lines()
         .map(|line| line.parse::<usize>().unwrap())
         .collect();
 
@@ -96,17 +94,10 @@ fn encryption_weakness(numbers: &[usize], invalid_number: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day9/test_input"
-                .to_string(),
-        );
-
-        let numbers: Vec<usize> = lines
-            .iter()
+        let input = include_str!("test_input");
+        let numbers: Vec<usize> = input.lines()
             .map(|line| line.parse::<usize>().unwrap())
             .collect();
 
@@ -114,14 +105,14 @@ mod tests {
     }
 
     #[test]
-    fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day9/test_input"
-                .to_string(),
-        );
+    fn part1_real_input() {
+        assert_eq!(super::solve_part_1(&include_str!("input")), 69316178);
+    }
 
-        let numbers: Vec<usize> = lines
-            .iter()
+    #[test]
+    fn part2_test_input() {
+        let input = include_str!("test_input");
+        let numbers: Vec<usize> = input.lines()
             .map(|line| line.parse::<usize>().unwrap())
             .collect();
 
@@ -129,22 +120,7 @@ mod tests {
     }
 
     #[test]
-    fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day9/input"
-                .to_string(),
-        );
-
-        assert_eq!(super::solve_part_1(&lines), 69316178);
-    }
-
-    #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day9/input"
-                .to_string(),
-        );
-
-        assert_eq!(super::solve_part_2(&lines), 9351526);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 9351526);
     }
 }

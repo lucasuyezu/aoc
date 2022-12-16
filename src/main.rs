@@ -124,7 +124,7 @@ fn main() {
     solve_string!(year2022, day1);
     solve_str!(year2021, day2);
     solve_str!(year2021, day1);
-    solve_string!(year2020, day9);
+    solve_str!(year2020, day9);
     solve_str!(year2020, day8);
     solve_str!(year2020, day7);
     solve_str!(year2020, day6);
