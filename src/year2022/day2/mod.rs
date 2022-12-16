@@ -1,8 +1,8 @@
-pub fn solve_part_1(lines: &[String]) -> usize {
+pub fn solve_part_1(input: &str) -> usize {
     let mut result = 0;
     
-    for line in lines {
-        match line.as_str() {
+    for line in input.lines() {
+        match line {
             "A X" => result += 1 + 3,
             "A Y" => result += 2 + 6,
             "A Z" => result += 3 + 0,
@@ -19,11 +19,11 @@ pub fn solve_part_1(lines: &[String]) -> usize {
     return result;
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
+pub fn solve_part_2(input: &str) -> usize {
     let mut result = 0;
     
-    for line in lines {
-        match line.as_str() {
+    for line in input.lines() {
+        match line {
             "A X" => result += 3 + 0,
             "A Y" => result += 1 + 3,
             "A Z" => result += 2 + 6,
@@ -42,41 +42,23 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day2/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 15);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 15);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day2/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 11_603);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 11_603);
     }
 
     #[test]
     fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day2/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 12);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 12);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2022/day2/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 12_725);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 12_725);
     }
 }
