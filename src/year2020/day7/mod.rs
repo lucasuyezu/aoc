@@ -7,11 +7,11 @@ struct BagRule {
     quantity: usize,
 }
 
-pub fn solve_part_1(lines: &[String]) -> usize {
+pub fn solve_part_1(input: &str) -> usize {
     // build hash map of bag handle => rules
     let mut inverted_tree_map = HashMap::<String, HashSet<String>>::new();
 
-    for line in lines {
+    for line in input.lines() {
         // parse line
         let index = line.find("bags contain").unwrap();
         let (bag_handle, rules_string) = line.split_at(index);
@@ -63,11 +63,11 @@ pub fn solve_part_1(lines: &[String]) -> usize {
     }
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
+pub fn solve_part_2(input: &str) -> usize {
     // build hash map of bag handle => rules
     let mut tree_map = HashMap::<String, HashSet<BagRule>>::new();
 
-    for line in lines {
+    for line in input.lines() {
         // parse line
         let index = line.find("bags contain").unwrap();
         let (bag_handle, rules_string) = line.split_at(index);
@@ -121,47 +121,24 @@ fn traverse_tree_map(tree_map: &HashMap<String, HashSet<BagRule>>, current_node:
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 4);
-    }
-
-    #[test]
-    fn part2_test_inputs() {
-        let mut lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 32);
-
-        lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/test_input_part_2"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 126);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 4);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 124);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 124);
+    }
+
+    #[test]
+    fn part2_test_inputs() {
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 32);
+        assert_eq!(super::solve_part_2(&include_str!("test_input_part_2")), 126);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day7/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 34862);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 34862);
     }
 }
