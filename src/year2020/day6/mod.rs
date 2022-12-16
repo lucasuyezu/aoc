@@ -36,25 +36,25 @@ impl BoardingGroup {
     }
 }
 
-pub fn solve_part_1(lines: &[String]) -> usize {
-    return boarding_groups(lines)
+pub fn solve_part_1(input: &str) -> usize {
+    return boarding_groups(input)
         .iter()
         .map(|group| group.one_answer_count())
         .sum();
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    return boarding_groups(lines)
+pub fn solve_part_2(input: &str) -> usize {
+    return boarding_groups(input)
         .iter()
         .map(|group| group.all_answer_count())
         .sum();
 }
 
-fn boarding_groups(lines: &[String]) -> Vec<BoardingGroup> {
+fn boarding_groups(input: &str) -> Vec<BoardingGroup> {
     let mut boarding_groups = Vec::<BoardingGroup>::new();
     let mut current_group_lines = Vec::<String>::new();
 
-    for line in lines {
+    for line in input.lines() {
         if !line.is_empty() {
             current_group_lines.push(line.to_string());
             continue;
@@ -79,41 +79,23 @@ fn boarding_groups(lines: &[String]) -> Vec<BoardingGroup> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day6/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 11);
-    }
-
-    #[test]
-    fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day6/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 6);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 11);
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day6/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 6911);
+        assert_eq!(super::solve_part_1(&include_str!("input")), 6911);
+    }
+
+    #[test]
+    fn part2_test_input() {
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 6);
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day6/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 3473);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 3473);
     }
 }
