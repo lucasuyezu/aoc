@@ -1,5 +1,14 @@
-pub fn solve_part_1(lines: &[String]) -> usize {
-    let mut numbers = get_structs(lines);
+fn parse_input(input: &str) -> Vec<usize> {
+    let numbers: Vec<usize> = input
+        .lines()
+        .map(|it| it.parse::<usize>().unwrap())
+        .collect();
+
+    numbers
+}
+
+pub fn solve_part_1(input: &str) -> Option<usize> {
+    let mut numbers = parse_input(input);
 
     numbers.sort_unstable();
 
@@ -9,7 +18,7 @@ pub fn solve_part_1(lines: &[String]) -> usize {
     while i < numbers.len() - 1 {
         while j < numbers.len() {
             if numbers[i] + numbers[j] == 2020 {
-                return numbers[i] * numbers[j];
+                return Some(numbers[i] * numbers[j]);
             } else {
             }
             j += 1;
@@ -18,11 +27,11 @@ pub fn solve_part_1(lines: &[String]) -> usize {
         i += 1;
     }
 
-    0
+    None
 }
 
-pub fn solve_part_2(lines: &[String]) -> usize {
-    let mut numbers = get_structs(lines);
+pub fn solve_part_2(input: &str) -> Option<usize> {
+    let mut numbers = parse_input(input);
 
     numbers.sort_unstable();
 
@@ -40,7 +49,7 @@ pub fn solve_part_2(lines: &[String]) -> usize {
 
             while k < numbers.len() {
                 if numbers[i] + numbers[j] + numbers[k] == 2020 {
-                    return numbers[i] * numbers[j] * numbers[k];
+                    return Some(numbers[i] * numbers[j] * numbers[k]);
                 }
 
                 k += 1;
@@ -55,55 +64,29 @@ pub fn solve_part_2(lines: &[String]) -> usize {
         i += 1;
     }
 
-    0
-}
-
-fn get_structs(lines: &[String]) -> Vec<usize> {
-    let numbers: Vec<usize> = lines
-        .iter()
-        .map(|it| it.parse::<usize>().unwrap())
-        .collect();
-
-    numbers
+    None
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
 
     #[test]
     fn part1_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 514579);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), Some(514579));
     }
 
     #[test]
     fn part1_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_1(&lines), 1014171);
+        assert_eq!(super::solve_part_1(&include_str!("input")), Some(1014171));
     }
 
     #[test]
     fn part2_test_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day1/test_input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 241861950);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), Some(241861950));
     }
 
     #[test]
     fn part2_real_input() {
-        let lines = utils::get_lines(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/year2020/day1/input"
-                .to_string(),
-        );
-        assert_eq!(super::solve_part_2(&lines), 46584630);
+        assert_eq!(super::solve_part_2(&include_str!("input")), Some(46584630));
     }
 }
