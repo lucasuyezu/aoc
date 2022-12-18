@@ -62,8 +62,6 @@ fn parse_input(input: &str) -> SlopeMap {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::utils;
-
     #[test]
     fn part1_test_input() {
         assert_eq!(super::solve_part_1(&include_str!("test_input")), 7);
