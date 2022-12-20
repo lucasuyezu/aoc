@@ -63,6 +63,7 @@ fn main() {
     solve_str!(year2022, day19);
     solve_str!(year2022, day18);
     solve_str!(year2022, day17);
+    solve_str!(year2022, day16);
     solve_str!(year2022, day15);
     solve_str!(year2022, day14);
     solve_str!(year2022, day13);
