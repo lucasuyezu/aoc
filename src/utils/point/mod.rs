@@ -4,6 +4,16 @@ pub struct Point {
     pub y: isize,
 }
 
+impl std::ops::Add for Point {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
 impl Point {
     pub fn manhattan_distance(&self, other_point: &Point) -> usize {
         (self.x - other_point.x).abs() as usize + (self.y - other_point.y).abs() as usize
@@ -21,5 +31,13 @@ mod tests {
 
         assert_eq!(point_a.manhattan_distance(&point_b), 11);
         assert_eq!(point_b.manhattan_distance(&point_a), 11);
+    }
+
+    #[test]
+    fn test_add() {
+        let point_a = Point { x: 1, y: -2 };
+        let point_b = Point { x: -3, y: 5 };
+
+        assert_eq!(Point { x: -2, y: 3 }, point_a + point_b);
     }
 }
