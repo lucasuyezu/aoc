@@ -57,11 +57,13 @@ impl FromStr for Blueprint {
 
 impl Blueprint {
     fn quality_level(&self, minutes_left: u32) -> u32 {
+        self.id * self.max_geode_count(minutes_left)
+    }
+
+    fn max_geode_count(&self, minutes_left: u32) -> u32 {
         let mut cache = HashMap::new();
         cache.insert("best".to_string(), 0);
-        let result = self.id * self.dfs(minutes_left, 1, 0, 0, 0, 0, 0, 0, 0, &mut cache);
-
-        println!("Total cache entries: {}", cache.len());
+        let result = self.dfs(minutes_left, 1, 0, 0, 0, 0, 0, 0, 0, &mut cache);
 
         result
     }
@@ -106,11 +108,6 @@ impl Blueprint {
         if let Some(cached_result) = cache.get(&cache_key) {
             return *cached_result;
         }
-
-        println!(
-            "minutes_left={:<3} ore_robots_count={:<3}, ore_count={:<3}, clay_robots_count={:<3}, clay_count={:<3}, obsidian_robots_count={:<3}, obsidian_count={:<3}, geode_robots_count={:<3}, geode_count={:<3}",
-            minutes_left, ore_robots_count, ore_count, clay_robots_count, clay_count, obsidian_robots_count, obsidian_count, geode_robots_count, geode_count,
-        );
 
         let mut max_geode_count = 0;
 
@@ -247,12 +244,39 @@ pub fn solve_part_1(input: &str) -> u32 {
     results.iter().sum()
 }
 
-pub fn solve_part_2(_input: &str) -> u32 {
-    0
+pub fn solve_part_2(input: &str) -> u32 {
+    let blueprints: Vec<Blueprint> = input
+        .lines()
+        .take(3)
+        .map(|line| line.parse::<Blueprint>().unwrap())
+        .collect();
+
+    let (tx, rx): (Sender<u32>, Receiver<u32>) = mpsc::channel();
+    let mut threads = vec![];
+
+    for blueprint in blueprints {
+        let thread_tx = tx.clone();
+        threads.push(thread::spawn(move || {
+            thread_tx.send(blueprint.max_geode_count(32)).unwrap();
+        }));
+    }
+
+    let mut results: Vec<u32> = vec![];
+
+    for _ in 0..threads.len() {
+        results.push(rx.recv().unwrap());
+    }
+
+    for thread in threads {
+        let _ = thread.join();
+    }
+
+    results.iter().product()
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::year2022::day19::Blueprint;
 
     #[test]
@@ -304,16 +328,33 @@ mod tests {
     #[test]
     fn part1_test_bp1() {
         let input = "Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.";
-        assert_eq!(super::solve_part_1(&input), 9);
+        assert_eq!(solve_part_1(&input), 9);
     }
 
     #[test]
     fn part1_test_input() {
-        assert_eq!(super::solve_part_1(&include_str!("test_input")), 33);
+        assert_eq!(solve_part_1(&include_str!("test_input")), 33);
     }
 
     #[test]
     fn part1_real_input() {
-        assert_eq!(super::solve_part_1(&include_str!("input")), 1413);
+        assert_eq!(solve_part_1(&include_str!("input")), 1413);
+    }
+
+    #[test]
+    fn part2_test_bp1() {
+        let input = "Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.";
+        assert_eq!(solve_part_2(&input), 56);
+    }
+
+    #[test]
+    fn part2_test_bp2() {
+        let input = "Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.";
+        assert_eq!(solve_part_2(&input), 62);
+    }
+
+    #[test]
+    fn part2_real_input() {
+        assert_eq!(solve_part_2(&include_str!("input")), 21080);
     }
 }
