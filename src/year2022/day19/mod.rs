@@ -1,4 +1,10 @@
-use std::{collections::HashMap, str::FromStr, string::ParseError};
+use std::{
+    collections::HashMap,
+    str::FromStr,
+    string::ParseError,
+    sync::mpsc::{self, Receiver, Sender},
+    thread,
+};
 
 use regex::Regex;
 
@@ -50,14 +56,19 @@ impl FromStr for Blueprint {
 }
 
 impl Blueprint {
-    fn quality_level(&self, minutes_left: u8) -> u32 {
-        // start with one ore collecting robot
-        self.id * self.dfs(minutes_left, 1, 0, 0, 0, 0, 0, 0, 0, &mut HashMap::new())
+    fn quality_level(&self, minutes_left: u32) -> u32 {
+        let mut cache = HashMap::new();
+        cache.insert("best".to_string(), 0);
+        let result = self.id * self.dfs(minutes_left, 1, 0, 0, 0, 0, 0, 0, 0, &mut cache);
+
+        println!("Total cache entries: {}", cache.len());
+
+        result
     }
 
     fn dfs(
         &self,
-        minutes_left: u8,
+        minutes_left: u32,
         ore_robots_count: u32,
         ore_count: u32,
         clay_robots_count: u32,
@@ -66,19 +77,18 @@ impl Blueprint {
         obsidian_count: u32,
         geode_robots_count: u32,
         geode_count: u32,
-        visited: &mut HashMap<String, u32>,
+        cache: &mut HashMap<String, u32>,
     ) -> u32 {
-        println!(
-            "minutes_left={:<3} ore_robots_count={:<3}, ore_count={:<3}, clay_robots_count={:<3}, clay_count={:<3}, obsidian_robots_count={:<3}, obsidian_count={:<3}, geode_robots_count={:<3}, geode_count={:<3}",
-            minutes_left, ore_robots_count, ore_count, clay_robots_count, clay_count, obsidian_robots_count, obsidian_count, geode_robots_count, geode_count,
-        );
-
-        if geode_count > 9 {
-            panic!();
-        }
-
         if minutes_left == 0 {
             return geode_count;
+        }
+
+        let upper_bound = geode_count
+            + (geode_robots_count * minutes_left)
+            + (minutes_left * (minutes_left + 1) / 2);
+
+        if upper_bound < *cache.get("best").unwrap() {
+            return 0;
         }
 
         let cache_key = format!(
@@ -93,9 +103,14 @@ impl Blueprint {
             geode_robots_count,
             geode_count,
         );
-        if let Some(cached_result) = visited.get(&cache_key) {
+        if let Some(cached_result) = cache.get(&cache_key) {
             return *cached_result;
         }
+
+        println!(
+            "minutes_left={:<3} ore_robots_count={:<3}, ore_count={:<3}, clay_robots_count={:<3}, clay_count={:<3}, obsidian_robots_count={:<3}, obsidian_count={:<3}, geode_robots_count={:<3}, geode_count={:<3}",
+            minutes_left, ore_robots_count, ore_count, clay_robots_count, clay_count, obsidian_robots_count, obsidian_count, geode_robots_count, geode_count,
+        );
 
         let mut max_geode_count = 0;
 
@@ -106,7 +121,8 @@ impl Blueprint {
         let new_geode_count = geode_count + geode_robots_count;
 
         // Build a geode robot
-        if ore_count >= self.geode_robot_ore_cost && obsidian_count > self.geode_robot_obsidian_cost
+        if ore_count >= self.geode_robot_ore_cost
+            && obsidian_count >= self.geode_robot_obsidian_cost
         {
             max_geode_count = max_geode_count.max(self.dfs(
                 minutes_left - 1,
@@ -118,14 +134,14 @@ impl Blueprint {
                 new_obsidian_count - self.geode_robot_obsidian_cost,
                 geode_robots_count + 1,
                 new_geode_count,
-                visited,
+                cache,
             ));
         }
 
         // Build an obsidian robot
         // No need to build an obsidian robot if I already have enough obsidian robots to build a geodoe robot
         if ore_count >= self.obsidian_robot_ore_cost
-            && clay_count > self.obsidian_robot_clay_cost
+            && clay_count >= self.obsidian_robot_clay_cost
             && obsidian_robots_count < self.geode_robot_obsidian_cost
         {
             max_geode_count = max_geode_count.max(self.dfs(
@@ -138,23 +154,9 @@ impl Blueprint {
                 new_obsidian_count,
                 geode_robots_count,
                 new_geode_count,
-                visited,
+                cache,
             ));
         }
-
-        // Do nothing and accumulate resources
-        max_geode_count = max_geode_count.max(self.dfs(
-            minutes_left - 1,
-            ore_robots_count,
-            new_ore_count,
-            clay_robots_count,
-            new_clay_count,
-            obsidian_robots_count,
-            new_obsidian_count,
-            geode_robots_count,
-            new_geode_count,
-            visited,
-        ));
 
         // Build a clay robot
         // No need to build a clay robot if I already have enough clay robots to build an obsidian robot
@@ -171,7 +173,7 @@ impl Blueprint {
                 new_obsidian_count,
                 geode_robots_count,
                 new_geode_count,
-                visited,
+                cache,
             ));
         }
 
@@ -188,36 +190,61 @@ impl Blueprint {
                 new_obsidian_count,
                 geode_robots_count,
                 new_geode_count,
-                visited,
+                cache,
             ));
         }
 
-        visited.insert(cache_key, max_geode_count);
+        // Do nothing and accumulate resources
+        max_geode_count = max_geode_count.max(self.dfs(
+            minutes_left - 1,
+            ore_robots_count,
+            new_ore_count,
+            clay_robots_count,
+            new_clay_count,
+            obsidian_robots_count,
+            new_obsidian_count,
+            geode_robots_count,
+            new_geode_count,
+            cache,
+        ));
+
+        cache.insert(cache_key, max_geode_count);
+
+        if max_geode_count > *cache.get("best").unwrap() {
+            cache.insert("best".to_string(), max_geode_count);
+        }
+
         max_geode_count
     }
 }
 
 pub fn solve_part_1(input: &str) -> u32 {
-    // let blueprints: Vec<Blueprint> = input
-    //     .lines()
-    //     .map(|line| line.parse::<Blueprint>().unwrap())
-    //     .collect();
+    let blueprints: Vec<Blueprint> = input
+        .lines()
+        .map(|line| line.parse::<Blueprint>().unwrap())
+        .collect();
 
-    let blueprints = vec![Blueprint {
-        id: 1,
-        ore_robot_cost: 4,
-        clay_robot_ore_cost: 2,
-        obsidian_robot_ore_cost: 3,
-        obsidian_robot_clay_cost: 14,
-        geode_robot_ore_cost: 2,
-        geode_robot_obsidian_cost: 7,
-        max_ore_cost: 4,
-    }];
+    let (tx, rx): (Sender<u32>, Receiver<u32>) = mpsc::channel();
+    let mut threads = vec![];
 
-    blueprints
-        .iter()
-        .map(|blueprint| blueprint.quality_level(24))
-        .sum()
+    for blueprint in blueprints {
+        let thread_tx = tx.clone();
+        threads.push(thread::spawn(move || {
+            thread_tx.send(blueprint.quality_level(24)).unwrap();
+        }));
+    }
+
+    let mut results: Vec<u32> = vec![];
+
+    for _ in 0..threads.len() {
+        results.push(rx.recv().unwrap());
+    }
+
+    for thread in threads {
+        let _ = thread.join();
+    }
+
+    results.iter().sum()
 }
 
 pub fn solve_part_2(_input: &str) -> u32 {
@@ -244,11 +271,49 @@ mod tests {
             },
             input.parse::<Blueprint>().unwrap()
         );
+        let input = "Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.";
+        assert_eq!(
+            Blueprint {
+                id: 2,
+                ore_robot_cost: 2,
+                clay_robot_ore_cost: 3,
+                obsidian_robot_ore_cost: 3,
+                obsidian_robot_clay_cost: 8,
+                geode_robot_ore_cost: 3,
+                geode_robot_obsidian_cost: 12,
+                max_ore_cost: 3,
+            },
+            input.parse::<Blueprint>().unwrap()
+        );
+        let input = "Blueprint 7: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 20 obsidian.";
+        assert_eq!(
+            Blueprint {
+                id: 7,
+                ore_robot_cost: 2,
+                clay_robot_ore_cost: 3,
+                obsidian_robot_ore_cost: 3,
+                obsidian_robot_clay_cost: 8,
+                geode_robot_ore_cost: 3,
+                geode_robot_obsidian_cost: 20,
+                max_ore_cost: 3,
+            },
+            input.parse::<Blueprint>().unwrap()
+        );
+    }
+
+    #[test]
+    fn part1_test_bp1() {
+        let input = "Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.";
+        assert_eq!(super::solve_part_1(&input), 9);
     }
 
     #[test]
     fn part1_test_input() {
-        let input = "Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.";
-        assert_eq!(super::solve_part_1(&input), 9);
+        assert_eq!(super::solve_part_1(&include_str!("test_input")), 33);
+    }
+
+    #[test]
+    fn part1_real_input() {
+        assert_eq!(super::solve_part_1(&include_str!("input")), 1413);
     }
 }
