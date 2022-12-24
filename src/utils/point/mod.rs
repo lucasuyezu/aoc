@@ -1,3 +1,12 @@
+pub const NORTH: Point = Point { x: -1, y: 0 };
+pub const NE: Point = Point { x: -1, y: 1 };
+pub const EAST: Point = Point { x: 0, y: 1 };
+pub const SE: Point = Point { x: 1, y: 1 };
+pub const SOUTH: Point = Point { x: 1, y: 0 };
+pub const SW: Point = Point { x: 1, y: -1 };
+pub const WEST: Point = Point { x: 0, y: -1 };
+pub const NW: Point = Point { x: -1, y: -1 };
+
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Copy)]
 pub struct Point {
     pub x: isize,

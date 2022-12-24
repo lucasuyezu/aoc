@@ -1,15 +1,6 @@
 use std::{collections::HashSet, str::FromStr, string::ParseError};
 
-use crate::utils::point::Point;
-
-const NORTH: Point = Point { x: -1, y: 0 };
-const NE: Point = Point { x: -1, y: 1 };
-const EAST: Point = Point { x: 0, y: 1 };
-const SE: Point = Point { x: 1, y: 1 };
-const SOUTH: Point = Point { x: 1, y: 0 };
-const SW: Point = Point { x: 1, y: -1 };
-const WEST: Point = Point { x: 0, y: -1 };
-const NW: Point = Point { x: -1, y: -1 };
+use crate::utils::point::*;
 
 const POSITION_DELTAS: [Point; 8] = [NORTH, NE, EAST, SE, SOUTH, SW, WEST, NW];
 
