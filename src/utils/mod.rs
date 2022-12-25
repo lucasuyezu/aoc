@@ -1,4 +1,5 @@
 pub mod point;
+pub mod snafu;
 
 pub fn get_arg(name: &str) -> Option<String> {
     let args: Vec<String> = std::env::args().collect();
