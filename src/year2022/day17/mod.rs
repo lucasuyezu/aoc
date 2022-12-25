@@ -88,7 +88,6 @@ impl Grid {
 
         for i in 1..=rock_count {
             let current_rock = RockShape::from(i);
-            println!("Spawned rock {}: {:?}", i, current_rock);
             let rock_starting_points =
                 current_rock.get_starting_points(if i == 1 { -1 } else { self.max_y });
 
@@ -112,7 +111,6 @@ impl Grid {
             loop {
                 let direction = chars.next().unwrap();
                 if self.can_move_horizontally(&current_rock, &rock_top_left, direction) {
-                    println!("Wil move horizontally towards {}", direction);
                     for old_point in &rock_points {
                         self.stuff_hash.remove(&old_point);
                     }
@@ -129,8 +127,6 @@ impl Grid {
                     for new_point in &rock_points {
                         self.stuff_hash.insert(new_point.clone(), "@".to_string());
                     }
-                } else {
-                    println!("Can't move horizontally.");
                 }
 
                 if let Some(timer_millis) = get_timer_millis() {
@@ -142,7 +138,6 @@ impl Grid {
 
                 // move down 1 line
                 if self.can_move_down(&current_rock, &rock_top_left) {
-                    println!("Rock not at rest. Will move down.");
                     for old_point in &rock_points {
                         self.stuff_hash.remove(&old_point);
                     }
@@ -172,10 +167,6 @@ impl Grid {
             }
 
             self.max_y = self.find_new_max_y();
-            println!(
-                "Rock at rest. max_y is now {}. Spawning new rock.",
-                self.max_y
-            );
         }
     }
 
@@ -418,10 +409,7 @@ impl Grid {
             for x in self.min_x..self.max_x {
                 let point = Point { x, y: y as isize };
                 if let Some(_value) = self.stuff_hash.get(&point) {
-                    // println!("Found {} in {:?}", value, point);
                     return y;
-                } else {
-                    // println!("Did not find anything at {:?}", point);
                 }
             }
         }

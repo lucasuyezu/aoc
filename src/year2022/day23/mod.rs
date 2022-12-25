@@ -1,6 +1,7 @@
-use std::{collections::HashSet, str::FromStr, string::ParseError};
+use core::time;
+use std::{collections::HashSet, str::FromStr, string::ParseError, thread};
 
-use crate::utils::point::*;
+use crate::utils::{get_timer_millis, point::*};
 
 const POSITION_DELTAS: [Point; 8] = [NORTH, NE, EAST, SE, SOUTH, SW, WEST, NW];
 
@@ -54,11 +55,14 @@ impl Grid {
     }
 
     fn run_rounds(&mut self, rounds: i32) {
-        println!("== Start ==");
-        self.print_frame();
+        if let Some(timer_millis) = get_timer_millis() {
+            self.print_frame();
 
-        for i in 1..=rounds {
-            println!("== Round {:?} ==", i);
+            let timer = time::Duration::from_millis(timer_millis);
+            thread::sleep(timer);
+        }
+
+        for _i in 1..=rounds {
             self.run_round();
         }
     }
@@ -117,8 +121,6 @@ impl Grid {
                 elves_moved += 1;
             }
         }
-
-        self.print_frame();
 
         let dir = self.directions.remove(0);
         self.directions.push(dir);

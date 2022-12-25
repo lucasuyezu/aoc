@@ -7,7 +7,7 @@ fn parse_input(input: &str) -> Vec<usize> {
     numbers
 }
 
-pub fn solve_part_1(input: &str) -> Option<usize> {
+pub fn solve_part_1(input: &str) -> usize {
     let mut numbers = parse_input(input);
 
     numbers.sort_unstable();
@@ -18,7 +18,7 @@ pub fn solve_part_1(input: &str) -> Option<usize> {
     while i < numbers.len() - 1 {
         while j < numbers.len() {
             if numbers[i] + numbers[j] == 2020 {
-                return Some(numbers[i] * numbers[j]);
+                return numbers[i] * numbers[j];
             } else {
             }
             j += 1;
@@ -27,10 +27,10 @@ pub fn solve_part_1(input: &str) -> Option<usize> {
         i += 1;
     }
 
-    None
+    panic!();
 }
 
-pub fn solve_part_2(input: &str) -> Option<usize> {
+pub fn solve_part_2(input: &str) -> usize {
     let mut numbers = parse_input(input);
 
     numbers.sort_unstable();
@@ -49,7 +49,7 @@ pub fn solve_part_2(input: &str) -> Option<usize> {
 
             while k < numbers.len() {
                 if numbers[i] + numbers[j] + numbers[k] == 2020 {
-                    return Some(numbers[i] * numbers[j] * numbers[k]);
+                    return numbers[i] * numbers[j] * numbers[k];
                 }
 
                 k += 1;
@@ -64,29 +64,30 @@ pub fn solve_part_2(input: &str) -> Option<usize> {
         i += 1;
     }
 
-    None
+    panic!();
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn part1_test_input() {
-        assert_eq!(super::solve_part_1(&include_str!("test_input")), Some(514579));
+        assert_eq!(solve_part_1(&include_str!("test_input")), 514579);
     }
 
     #[test]
     fn part1_real_input() {
-        assert_eq!(super::solve_part_1(&include_str!("input")), Some(1014171));
+        assert_eq!(solve_part_1(&include_str!("input")), 1014171);
     }
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2(&include_str!("test_input")), Some(241861950));
+        assert_eq!(solve_part_2(&include_str!("test_input")), 241861950);
     }
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("input")), Some(46584630));
+        assert_eq!(solve_part_2(&include_str!("input")), 46584630);
     }
 }

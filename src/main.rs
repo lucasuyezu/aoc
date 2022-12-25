@@ -22,27 +22,29 @@ macro_rules! solve_str {
         let read_file_duration = now.elapsed();
 
         let t1_instant = Instant::now();
-        $year::$day::solve_part_1(&lines);
+        let result_1 = $year::$day::solve_part_1(&lines);
         let solve_duration = t1_instant.elapsed();
 
         println!(
-            "{} {} part1 read_file_duration={}\tsolve_duration={}",
+            "{} {} part1 read_file_duration={}\tsolve_duration={}\tresult={}",
             stringify!($year),
             stringify!($day),
             duration_with_colour(read_file_duration),
             duration_with_colour(solve_duration),
+            result_1,
         );
 
         let t2_instant = Instant::now();
-        $year::$day::solve_part_2(&lines);
+        let result_2 = $year::$day::solve_part_2(&lines);
         let solve_duration = t2_instant.elapsed();
 
         println!(
-            "{} {} part2 read_file_duration={}\tsolve_duration={}",
+            "{} {} part2 read_file_duration={}\tsolve_duration={}\tresult={}",
             stringify!($year),
             stringify!($day),
             duration_with_colour(read_file_duration),
-            duration_with_colour(solve_duration)
+            duration_with_colour(solve_duration),
+            result_2,
         );
     };
 }
