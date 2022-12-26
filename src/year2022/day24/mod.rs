@@ -42,13 +42,7 @@ fn parse_input(s: &str) -> (Grid, Vec<Blizzard>, Point, Point) {
     }
 
     end.x = max_x;
-    end.y = s
-        .lines()
-        .last()
-        .unwrap()
-        .chars()
-        .position(|c| c == '.')
-        .unwrap() as isize;
+    end.y = s.lines().last().unwrap().chars().position(|c| c == '.').unwrap() as isize;
 
     (Grid { max_x, max_y }, blizzards, start, end)
 }
@@ -68,10 +62,7 @@ fn print_frame(grid: &Grid, start: &Point, end: &Point, blizzards: &Vec<Blizzard
             } else if x == 0 || x == grid.max_x || y == 0 || y == grid.max_y {
                 frame.push('#');
             } else {
-                let pos_blizzards: Vec<&Blizzard> = blizzards
-                    .iter()
-                    .filter(|blizzard| blizzard.pos == point)
-                    .collect();
+                let pos_blizzards: Vec<&Blizzard> = blizzards.iter().filter(|blizzard| blizzard.pos == point).collect();
 
                 if pos_blizzards.len() > 1 {
                     frame.push_str(pos_blizzards.len().to_string().as_str());
@@ -88,12 +79,7 @@ fn print_frame(grid: &Grid, start: &Point, end: &Point, blizzards: &Vec<Blizzard
     print!("{}", frame);
 }
 
-fn bfs(
-    grid: &Grid,
-    start: &Point,
-    end: &Point,
-    blizzards: &Vec<Blizzard>,
-) -> (usize, Vec<Blizzard>) {
+fn bfs(grid: &Grid, start: &Point, end: &Point, blizzards: &Vec<Blizzard>) -> (usize, Vec<Blizzard>) {
     let mut visited: HashSet<(Point, usize)> = HashSet::new();
     let mut queue: VecDeque<(Point, Vec<Blizzard>, usize)> = VecDeque::new();
 
@@ -105,8 +91,7 @@ fn bfs(
             return (current_time, current_blizzards);
         }
 
-        let (neighbours, moved_blizzards) =
-            neighbours(&grid, start, end, &current_pos, &current_blizzards);
+        let (neighbours, moved_blizzards) = neighbours(&grid, start, end, &current_pos, &current_blizzards);
         for neighbour in neighbours {
             if !visited.contains(&(neighbour, current_time + 1)) {
                 queue.push_back((neighbour, moved_blizzards.clone(), current_time + 1));
@@ -142,8 +127,7 @@ fn neighbours(
         .filter(|point| {
             point == start
                 || point == end
-                || ((point.x > 0 && point.x <= grid.max_x - 1)
-                    && (point.y > 0 && point.y <= grid.max_y - 1))
+                || ((point.x > 0 && point.x <= grid.max_x - 1) && (point.y > 0 && point.y <= grid.max_y - 1))
         })
         .collect();
 
