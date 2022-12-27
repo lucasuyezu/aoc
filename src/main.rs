@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 
+use crate::utils::get_arg;
 use std::fs;
 use std::time::{Duration, Instant};
 
@@ -12,40 +13,44 @@ mod year2022;
 
 macro_rules! solve_str {
     ($year:ident, $day:ident) => {
-        let now = Instant::now();
-        let lines = fs::read_to_string(format!(
-            "/Users/lucas/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
-            stringify!($year),
-            stringify!($day)
-        ))
-        .unwrap();
-        let read_file_duration = now.elapsed();
+        if get_arg("year").unwrap_or(stringify!($year).to_string()) == stringify!($year)
+            && get_arg("day").unwrap_or(stringify!($day).to_string()) == stringify!($day)
+        {
+            let now = Instant::now();
+            let lines = fs::read_to_string(format!(
+                "/Users/lucas/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
+                stringify!($year),
+                stringify!($day)
+            ))
+            .unwrap();
+            let read_file_duration = now.elapsed();
 
-        let t1_instant = Instant::now();
-        let result_1 = $year::$day::solve_part_1(&lines);
-        let solve_duration = t1_instant.elapsed();
+            let t1_instant = Instant::now();
+            let result_1 = $year::$day::solve_part_1(&lines);
+            let solve_duration = t1_instant.elapsed();
 
-        println!(
-            "{} {} part1 read_file_duration={}\tsolve_duration={}\tresult={}",
-            stringify!($year),
-            stringify!($day),
-            duration_with_colour(read_file_duration),
-            duration_with_colour(solve_duration),
-            result_1,
-        );
+            println!(
+                "{} {} part1 read_file_duration={}\tsolve_duration={}\tresult={}",
+                stringify!($year),
+                stringify!($day),
+                duration_with_colour(read_file_duration),
+                duration_with_colour(solve_duration),
+                result_1,
+            );
 
-        let t2_instant = Instant::now();
-        let result_2 = $year::$day::solve_part_2(&lines);
-        let solve_duration = t2_instant.elapsed();
+            let t2_instant = Instant::now();
+            let result_2 = $year::$day::solve_part_2(&lines);
+            let solve_duration = t2_instant.elapsed();
 
-        println!(
-            "{} {} part2 read_file_duration={}\tsolve_duration={}\tresult={}",
-            stringify!($year),
-            stringify!($day),
-            duration_with_colour(read_file_duration),
-            duration_with_colour(solve_duration),
-            result_2,
-        );
+            println!(
+                "{} {} part2 read_file_duration={}\tsolve_duration={}\tresult={}",
+                stringify!($year),
+                stringify!($day),
+                duration_with_colour(read_file_duration),
+                duration_with_colour(solve_duration),
+                result_2,
+            );
+        }
     };
 }
 
