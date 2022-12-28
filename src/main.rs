@@ -55,9 +55,9 @@ macro_rules! solve_str {
 }
 
 fn duration_with_colour(duration: Duration) -> String {
-    let color = if duration.as_micros() < 10 {
+    let color = if duration.as_millis() < 1 {
         92
-    } else if duration.as_millis() < 1 {
+    } else if duration.as_secs() < 1 {
         93
     } else {
         31
@@ -105,3 +105,4 @@ fn main() {
     solve_str!(year2020, day1);
     solve_str!(year2015, day1);
 }
+
