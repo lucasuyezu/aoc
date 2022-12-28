@@ -26,7 +26,7 @@ fn parse_input(input: &str) -> (HashMap<usize, Valve>, HashMap<usize, Vec<usize>
         let cap = LINE_RE.captures_iter(line).next().unwrap();
 
         let valve = Valve {
-            id: i + 1,
+            id: 2_usize.pow(i as u32 + 1),
             name: cap[1].to_string(),
             flow_rate: cap[2].parse().unwrap(),
         };
@@ -54,16 +54,11 @@ fn parse_input(input: &str) -> (HashMap<usize, Valve>, HashMap<usize, Vec<usize>
 fn solve(
     valves: &HashMap<usize, Valve>,
     edges: &HashMap<usize, Vec<usize>>,
-    open_valves: &HashSet<Valve>,
-    valve_id: &usize,
-    visited: &mut HashMap<String, usize>,
+    open_valves: usize,
+    valve_id: usize,
+    visited: &mut HashMap<(usize, usize, usize), usize>,
     minutes_left: usize,
 ) -> usize {
-    let open_valves_names = open_valves
-        .iter()
-        .map(|open_valve| open_valve.name.clone())
-        .collect::<Vec<String>>();
-
     // println!(
     //     "{} minutes left. on valve {}. open valves {:?}",
     //     minutes_left, valve_name, open_valves_names
@@ -73,7 +68,8 @@ fn solve(
         return 0;
     }
 
-    let cache_key = format!("{}-{}-{:?}", minutes_left, valve_id, open_valves_names);
+    // let cache_key = format!("{}-{}-{:?}", minutes_left, valve_id, open_valves_names);
+    let cache_key = (minutes_left, valve_id, open_valves);
     // println!("Cache key is {}", cache_key);
     if let Some(cached_result) = visited.get(&cache_key) {
         // println!("cached_result: {}", cached_result);
@@ -84,18 +80,21 @@ fn solve(
     let mut max_pressure = 0;
 
     // Open valve if flow rate > 0
-    if !open_valves.contains(&valve) && valve.flow_rate > 0 {
-        let mut new_open_valves = open_valves.clone();
-        new_open_valves.insert(valve.clone());
-        let result = solve(valves, edges, &new_open_valves, valve_id, visited, minutes_left - 1);
+    if (open_valves & valve.id == 0) && valve.flow_rate > 0 {
+        // dbg!(open_valves);
+        // dbg!(valve);
+        // dbg!(open_valves & valve_id);
+        // dbg!(open_valves | valve_id);
+        // panic!();
+
+        let new_open_valves = open_valves | valve_id;
+        let result = solve(valves, edges, new_open_valves, valve_id, visited, minutes_left - 1);
         max_pressure = max_pressure.max(((minutes_left - 1) * valve.flow_rate) + result);
     }
 
     // walk to all edges
     for edge_id in edges.get(&valve_id).unwrap() {
-        let mut new_open_valves = open_valves.clone();
-        new_open_valves.insert(valve.clone());
-        let result = solve(valves, edges, open_valves, edge_id, visited, minutes_left - 1);
+        let result = solve(valves, edges, open_valves, *edge_id, visited, minutes_left - 1);
         max_pressure = max_pressure.max(result);
     }
 
@@ -107,14 +106,7 @@ pub fn solve_part_1(input: &str) -> usize {
     let (valves, edges) = parse_input(input);
     let start_valve = valves.values().find(|valve| valve.name == String::from("AA")).unwrap();
 
-    solve(
-        &valves,
-        &edges,
-        &mut HashSet::new(),
-        &start_valve.id,
-        &mut HashMap::new(),
-        30,
-    )
+    solve(&valves, &edges, 0, start_valve.id, &mut HashMap::new(), 30)
 }
 
 pub fn solve_part_2(_input: &str) -> usize {
