@@ -1,9 +1,13 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+};
 
 use regex::Regex;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Valve {
+    id: usize,
     name: String,
     flow_rate: usize,
 }
@@ -13,34 +17,45 @@ lazy_static! {
         Regex::new(r"Valve (\w+) has flow rate=(\d+); tunnels? leads? to valves? (.+)").unwrap();
 }
 
-fn parse_input(input: &str) -> (HashMap<String, Valve>, HashMap<String, Vec<String>>) {
-    let mut valves: HashMap<String, Valve> = HashMap::new();
-    let mut edges: HashMap<String, Vec<String>> = HashMap::new();
+fn parse_input(input: &str) -> (HashMap<usize, Valve>, HashMap<usize, Vec<usize>>) {
+    let mut valves: HashMap<usize, Valve> = HashMap::new();
+    let mut edges_names: HashMap<usize, Vec<String>> = HashMap::new();
+    let mut edges_ids: HashMap<usize, Vec<usize>> = HashMap::new();
 
-    for line in input.lines() {
+    for (i, line) in input.lines().enumerate() {
         let cap = LINE_RE.captures_iter(line).next().unwrap();
 
         let valve = Valve {
+            id: i + 1,
             name: cap[1].to_string(),
             flow_rate: cap[2].parse().unwrap(),
         };
 
-        edges.insert(
-            valve.name.clone(),
-            cap[3].split(',').map(|s| s.trim().to_string()).collect(),
-        );
+        edges_names.insert(valve.id, cap[3].split(',').map(|s| s.trim().to_string()).collect());
 
-        valves.insert(valve.name.to_string(), valve);
+        valves.insert(valve.id, valve);
     }
 
-    (valves, edges)
+    for valve in valves.values() {
+        edges_ids.insert(
+            valve.id,
+            edges_names
+                .get(&valve.id)
+                .unwrap()
+                .iter()
+                .map(|edge_name| valves.values().find(|valve| valve.name == *edge_name).unwrap().id)
+                .collect::<Vec<_>>(),
+        );
+    }
+
+    (valves, edges_ids)
 }
 
 fn solve(
-    valves: &HashMap<String, Valve>,
-    edges: &HashMap<String, Vec<String>>,
+    valves: &HashMap<usize, Valve>,
+    edges: &HashMap<usize, Vec<usize>>,
     open_valves: &HashSet<Valve>,
-    valve_name: &String,
+    valve_id: &usize,
     visited: &mut HashMap<String, usize>,
     minutes_left: usize,
 ) -> usize {
@@ -49,52 +64,38 @@ fn solve(
         .map(|open_valve| open_valve.name.clone())
         .collect::<Vec<String>>();
 
-    println!(
-        "{} minutes left. on valve {}. open valves {:?}",
-        minutes_left, valve_name, open_valves_names
-    );
+    // println!(
+    //     "{} minutes left. on valve {}. open valves {:?}",
+    //     minutes_left, valve_name, open_valves_names
+    // );
     if minutes_left == 0 {
-        println!("\tTime's up. Returning zero");
+        // println!("\tTime's up. Returning zero");
         return 0;
     }
 
-    let cache_key = format!("{}-{}-{:?}", minutes_left, valve_name, open_valves_names);
-    println!("Cache key is {}", cache_key);
+    let cache_key = format!("{}-{}-{:?}", minutes_left, valve_id, open_valves_names);
+    // println!("Cache key is {}", cache_key);
     if let Some(cached_result) = visited.get(&cache_key) {
-        println!("cached_result: {}", cached_result);
+        // println!("cached_result: {}", cached_result);
         return *cached_result;
     }
 
-    let valve = valves.get(valve_name).unwrap();
+    let valve = valves.get(&valve_id).unwrap();
     let mut max_pressure = 0;
 
     // Open valve if flow rate > 0
     if !open_valves.contains(&valve) && valve.flow_rate > 0 {
         let mut new_open_valves = open_valves.clone();
         new_open_valves.insert(valve.clone());
-        let result = solve(
-            valves,
-            edges,
-            &new_open_valves,
-            valve_name,
-            visited,
-            minutes_left - 1,
-        );
+        let result = solve(valves, edges, &new_open_valves, valve_id, visited, minutes_left - 1);
         max_pressure = max_pressure.max(((minutes_left - 1) * valve.flow_rate) + result);
     }
 
     // walk to all edges
-    for edge_name in edges.get(valve_name).unwrap() {
+    for edge_id in edges.get(&valve_id).unwrap() {
         let mut new_open_valves = open_valves.clone();
         new_open_valves.insert(valve.clone());
-        let result = solve(
-            valves,
-            edges,
-            open_valves,
-            edge_name,
-            visited,
-            minutes_left - 1,
-        );
+        let result = solve(valves, edges, open_valves, edge_id, visited, minutes_left - 1);
         max_pressure = max_pressure.max(result);
     }
 
@@ -104,11 +105,13 @@ fn solve(
 
 pub fn solve_part_1(input: &str) -> usize {
     let (valves, edges) = parse_input(input);
+    let start_valve = valves.values().find(|valve| valve.name == String::from("AA")).unwrap();
+
     solve(
         &valves,
         &edges,
         &mut HashSet::new(),
-        &String::from("AA"),
+        &start_valve.id,
         &mut HashMap::new(),
         30,
     )
