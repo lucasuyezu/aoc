@@ -1,6 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
-    hash::Hash,
+    collections::{HashMap},
 };
 
 use regex::Regex;
@@ -26,7 +25,7 @@ fn parse_input(input: &str) -> (HashMap<usize, Valve>, HashMap<usize, Vec<usize>
         let cap = LINE_RE.captures_iter(line).next().unwrap();
 
         let valve = Valve {
-            id: 2_usize.pow(i as u32 + 1),
+            id: i + 1,
             name: cap[1].to_string(),
             flow_rate: cap[2].parse().unwrap(),
         };
@@ -80,14 +79,15 @@ fn solve(
     let mut max_pressure = 0;
 
     // Open valve if flow rate > 0
-    if (open_valves & valve.id == 0) && valve.flow_rate > 0 {
-        // dbg!(open_valves);
-        // dbg!(valve);
-        // dbg!(open_valves & valve_id);
-        // dbg!(open_valves | valve_id);
-        // panic!();
+    if (open_valves & (1 << valve_id) == 0) && valve.flow_rate > 0 {
+         // dbg!(open_valves);
+         // dbg!(valve);
+         // dbg!(open_valves & (1 << valve_id));
+         // dbg!(open_valves | (1 << valve_id));
+         // panic!();
 
-        let new_open_valves = open_valves | valve_id;
+        let new_open_valves = open_valves | (1 << valve_id);
+        assert!(new_open_valves > open_valves);
         let result = solve(valves, edges, new_open_valves, valve_id, visited, minutes_left - 1);
         max_pressure = max_pressure.max(((minutes_left - 1) * valve.flow_rate) + result);
     }
