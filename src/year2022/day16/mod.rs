@@ -1,6 +1,4 @@
-use std::{
-    collections::{HashMap},
-};
+use std::collections::HashMap;
 
 use regex::Regex;
 
@@ -25,7 +23,7 @@ fn parse_input(input: &str) -> (HashMap<usize, Valve>, HashMap<usize, Vec<usize>
         let cap = LINE_RE.captures_iter(line).next().unwrap();
 
         let valve = Valve {
-            id: i + 1,
+            id: i,
             name: cap[1].to_string(),
             flow_rate: cap[2].parse().unwrap(),
         };
@@ -52,49 +50,61 @@ fn parse_input(input: &str) -> (HashMap<usize, Valve>, HashMap<usize, Vec<usize>
 
 fn solve(
     valves: &HashMap<usize, Valve>,
-    edges: &HashMap<usize, Vec<usize>>,
+    distances: &Vec<Vec<usize>>,
     open_valves: usize,
     valve_id: usize,
-    visited: &mut HashMap<(usize, usize, usize), usize>,
+    visited: &mut HashMap<(usize, usize, usize, usize), usize>,
     minutes_left: usize,
+    num_players: usize,
 ) -> usize {
-    // println!(
-    //     "{} minutes left. on valve {}. open valves {:?}",
-    //     minutes_left, valve_name, open_valves_names
-    // );
-    if minutes_left == 0 {
-        // println!("\tTime's up. Returning zero");
-        return 0;
+    if minutes_left <= 1 {
+        if num_players == 1 {
+            return 0;
+        } else {
+            return solve(valves, distances, open_valves, 0, visited, 26, num_players - 1);
+        }
     }
 
-    // let cache_key = format!("{}-{}-{:?}", minutes_left, valve_id, open_valves_names);
-    let cache_key = (minutes_left, valve_id, open_valves);
-    // println!("Cache key is {}", cache_key);
+    let cache_key = (minutes_left, valve_id, open_valves, num_players);
     if let Some(cached_result) = visited.get(&cache_key) {
-        // println!("cached_result: {}", cached_result);
         return *cached_result;
     }
 
     let valve = valves.get(&valve_id).unwrap();
     let mut max_pressure = 0;
 
-    // Open valve if flow rate > 0
-    if (open_valves & (1 << valve_id) == 0) && valve.flow_rate > 0 {
-         // dbg!(open_valves);
-         // dbg!(valve);
-         // dbg!(open_valves & (1 << valve_id));
-         // dbg!(open_valves | (1 << valve_id));
-         // panic!();
-
+    if (minutes_left > 1 && open_valves & (1 << valve_id) == 0) && valve.flow_rate > 0 {
         let new_open_valves = open_valves | (1 << valve_id);
-        assert!(new_open_valves > open_valves);
-        let result = solve(valves, edges, new_open_valves, valve_id, visited, minutes_left - 1);
+        let result = solve(
+            valves,
+            distances,
+            new_open_valves,
+            valve_id,
+            visited,
+            minutes_left - 1,
+            num_players,
+        );
         max_pressure = max_pressure.max(((minutes_left - 1) * valve.flow_rate) + result);
     }
 
-    // walk to all edges
-    for edge_id in edges.get(&valve_id).unwrap() {
-        let result = solve(valves, edges, open_valves, *edge_id, visited, minutes_left - 1);
+    let closed_valves_with_flow: Vec<&Valve> = valves
+        .values()
+        .filter(|valve| valve.id != valve_id)
+        .filter(|valve| open_valves & (1 << valve.id) == 0)
+        .filter(|valve| valve.flow_rate > 0)
+        .filter(|valve| minutes_left >= distances[valve_id][valve.id])
+        .collect();
+
+    for edge in closed_valves_with_flow {
+        let result = solve(
+            valves,
+            distances,
+            open_valves,
+            edge.id,
+            visited,
+            minutes_left - distances[valve_id][edge.id],
+            num_players,
+        );
         max_pressure = max_pressure.max(result);
     }
 
@@ -102,26 +112,65 @@ fn solve(
     return max_pressure;
 }
 
-pub fn solve_part_1(input: &str) -> usize {
-    let (valves, edges) = parse_input(input);
-    let start_valve = valves.values().find(|valve| valve.name == String::from("AA")).unwrap();
+fn floyd_warshall(valves: &HashMap<usize, Valve>, edges: &HashMap<usize, Vec<usize>>) -> Vec<Vec<usize>> {
+    let mut distances: Vec<Vec<usize>> = vec![vec![valves.len() + 100; valves.len()]; valves.len()];
 
-    solve(&valves, &edges, 0, start_valve.id, &mut HashMap::new(), 30)
+    for i in 0..valves.len() {
+        distances[i][i] = 0;
+    }
+
+    for valve in valves.values() {
+        for neighbour_name in edges.get(&valve.id).unwrap().iter() {
+            let neighbour = valves.get(neighbour_name).unwrap();
+            distances[valve.id][neighbour.id] = 1;
+            distances[neighbour.id][valve.id] = 1;
+        }
+    }
+
+    for k in 0..valves.len() {
+        for i in 0..valves.len() {
+            for j in 0..valves.len() {
+                distances[i][j] = distances[i][j].min(distances[i][k] + distances[k][j])
+            }
+        }
+    }
+
+    distances
 }
 
-pub fn solve_part_2(_input: &str) -> usize {
-    0
+pub fn solve_part_1(input: &str) -> usize {
+    let (valves, edges) = parse_input(input);
+    let distances = floyd_warshall(&valves, &edges);
+    solve(&valves, &distances, 0, 0, &mut HashMap::new(), 30, 1)
+}
+
+pub fn solve_part_2(input: &str) -> usize {
+    let (valves, edges) = parse_input(input);
+    let distances = floyd_warshall(&valves, &edges);
+    solve(&valves, &distances, 0, 0, &mut HashMap::new(), 26, 2)
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn part1_test_input() {
-        assert_eq!(super::solve_part_1(&include_str!("test_input")), 1651);
+        assert_eq!(solve_part_1(&include_str!("test_input")), 1651);
     }
 
     #[test]
     fn part1_real_input() {
-        assert_eq!(super::solve_part_1(&include_str!("input")), 1638);
+        assert_eq!(solve_part_1(&include_str!("input")), 1638);
+    }
+
+    #[test]
+    fn part2_test_input() {
+        assert_eq!(solve_part_2(&include_str!("test_input")), 1707);
+    }
+
+    #[test]
+    fn part2_real_input() {
+        assert_eq!(solve_part_2(&include_str!("input")), 2400);
     }
 }
