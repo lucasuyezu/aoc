@@ -19,7 +19,6 @@ pub fn solve_part_1(input: &str) -> usize {
 
 pub fn solve_part_2(input: &str) -> usize {
     let first_re = Regex::new(r"\d|one|two|three|four|five|six|seven|eight|nine").unwrap();
-
     let tokens = vec![
         "1", "2", "3", "4", "5", "6", "7", "8", "9", "one", "two", "three", "four", "five", "six", "seven", "eight",
         "nine",
@@ -30,18 +29,7 @@ pub fn solve_part_2(input: &str) -> usize {
         .into_iter()
         .map(|line| {
             let first_match = first_re.find(line).unwrap().as_str();
-
-            let mut second_match = "oh_no";
-            let mut idx = 0;
-
-            for token in tokens.iter() {
-                if let Some(current_idx) = line.rfind(token) {
-                    if current_idx >= idx {
-                        idx = current_idx;
-                        second_match = token;
-                    }
-                }
-            }
+            let second_match = tokens.iter().max_by_key(|token| line.rfind(*token)).unwrap();
 
             string_to_digit(first_match) * 10 + string_to_digit(second_match)
         })
