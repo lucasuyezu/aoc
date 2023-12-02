@@ -1,6 +1,8 @@
-use std::{str::FromStr, string::ParseError};
+use std::str::FromStr;
 
-use regex::Regex;
+use regex::{Match, Regex};
+
+use crate::utils::ParseInputError;
 
 #[derive(Debug)]
 pub struct GameSet {
@@ -15,7 +17,7 @@ impl GameSet {
 }
 
 impl FromStr for GameSet {
-    type Err = ParseError;
+    type Err = ParseInputError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -30,20 +32,28 @@ impl FromStr for GameSet {
             b_count: 0,
         };
 
-        if let Some(str_match) = R_RE.find(s) {
-            game_set.r_count = str_match.as_str().split(" ").next().unwrap().parse().unwrap();
+        if R_RE.is_match(s) {
+            game_set.r_count = str_to_count(R_RE.find(s))?;
         }
 
-        if let Some(str_match) = G_RE.find(s) {
-            game_set.g_count = str_match.as_str().split(" ").next().unwrap().parse().unwrap();
+        if G_RE.is_match(s) {
+            game_set.g_count = str_to_count(G_RE.find(s))?;
         }
 
-        if let Some(str_match) = B_RE.find(s) {
-            game_set.b_count = str_match.as_str().split(" ").next().unwrap().parse().unwrap();
+        if B_RE.is_match(s) {
+            game_set.b_count = str_to_count(B_RE.find(s))?;
         }
 
         Ok(game_set)
     }
+}
+
+fn str_to_count(re_match: Option<Match>) -> Result<usize, ParseInputError> {
+    re_match
+        .and_then(|s| Some(s.as_str()))
+        .and_then(|s| s.split(" ").next())
+        .and_then(|s| s.parse::<usize>().ok())
+        .ok_or(ParseInputError)
 }
 
 #[derive(Debug)]
@@ -67,17 +77,22 @@ impl Game {
 }
 
 impl FromStr for Game {
-    type Err = ParseError;
+    type Err = ParseInputError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut game = Game { id: 0, sets: vec![] };
 
-        let lines: Vec<&str> = s.split(":").collect();
+        let split = s.split_once(":").ok_or(ParseInputError)?;
 
-        game.id = lines[0].split(" ").last().unwrap().parse().unwrap();
-        game.sets = lines[1]
+        game.id = split
+            .0
+            .split_once(" ")
+            .and_then(|s| s.1.parse::<usize>().ok())
+            .ok_or(ParseInputError)?;
+
+        game.sets = split
+            .1
             .split(";")
-            .into_iter()
             .map(|set_str| set_str.parse::<GameSet>().unwrap())
             .collect();
 
@@ -88,7 +103,6 @@ impl FromStr for Game {
 pub fn solve_part_1(input: &str) -> usize {
     input
         .lines()
-        .into_iter()
         .map(|line| line.parse::<Game>().unwrap())
         .filter(|game| game.is_possible(12, 13, 14))
         .map(|game| game.id)
@@ -98,7 +112,6 @@ pub fn solve_part_1(input: &str) -> usize {
 pub fn solve_part_2(input: &str) -> usize {
     input
         .lines()
-        .into_iter()
         .map(|line| line.parse::<Game>().unwrap())
         .map(|game| game.power_level())
         .sum()
