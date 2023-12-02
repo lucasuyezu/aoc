@@ -4,15 +4,13 @@ use regex::Regex;
 
 #[derive(Debug)]
 pub struct GameSet {
-    r_count: Option<usize>,
-    g_count: Option<usize>,
-    b_count: Option<usize>,
+    r_count: usize,
+    g_count: usize,
+    b_count: usize,
 }
 impl GameSet {
     fn is_possible(&self, max_r: usize, max_g: usize, max_b: usize) -> bool {
-        (self.r_count.is_none() || self.r_count.is_some() && self.r_count.unwrap() <= max_r)
-            && (self.g_count.is_none() || self.g_count.is_some() && self.g_count.unwrap() <= max_g)
-            && (self.b_count.is_none() || self.b_count.is_some() && self.b_count.unwrap() <= max_b)
+        self.r_count <= max_r && self.g_count <= max_g && self.b_count <= max_b
     }
 }
 
@@ -27,24 +25,24 @@ impl FromStr for GameSet {
         }
 
         let mut game_set = GameSet {
-            r_count: None,
-            g_count: None,
-            b_count: None,
+            r_count: 0,
+            g_count: 0,
+            b_count: 0,
         };
 
         if let Some(str_match) = R_RE.find(s) {
-            game_set.r_count = str_match.as_str().split(" ").next().unwrap().parse().ok();
+            game_set.r_count = str_match.as_str().split(" ").next().unwrap().parse().unwrap();
         }
 
         if let Some(str_match) = G_RE.find(s) {
-            game_set.g_count = str_match.as_str().split(" ").next().unwrap().parse().ok();
+            game_set.g_count = str_match.as_str().split(" ").next().unwrap().parse().unwrap();
         }
 
         if let Some(str_match) = B_RE.find(s) {
-            game_set.b_count = str_match.as_str().split(" ").next().unwrap().parse().ok();
+            game_set.b_count = str_match.as_str().split(" ").next().unwrap().parse().unwrap();
         }
 
-        return Ok(game_set);
+        Ok(game_set)
     }
 }
 
@@ -56,15 +54,15 @@ pub struct Game {
 
 impl Game {
     fn is_possible(&self, max_r: usize, max_g: usize, max_b: usize) -> bool {
-        return self.sets.iter().all(|set| set.is_possible(max_r, max_g, max_b));
+        self.sets.iter().all(|set| set.is_possible(max_r, max_g, max_b))
     }
 
     fn power_level(&self) -> usize {
-        let max_r = self.sets.iter().filter_map(|set| set.r_count).max().unwrap();
-        let max_g = self.sets.iter().filter_map(|set| set.g_count).max().unwrap();
-        let max_b = self.sets.iter().filter_map(|set| set.b_count).max().unwrap();
+        let max_r = self.sets.iter().map(|set| set.r_count).max().unwrap();
+        let max_g = self.sets.iter().map(|set| set.g_count).max().unwrap();
+        let max_b = self.sets.iter().map(|set| set.b_count).max().unwrap();
 
-        return max_r * max_g * max_b;
+        max_r * max_g * max_b
     }
 }
 
@@ -83,27 +81,27 @@ impl FromStr for Game {
             .map(|set_str| set_str.parse::<GameSet>().unwrap())
             .collect();
 
-        return Ok(game);
+        Ok(game)
     }
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    return input
+    input
         .lines()
         .into_iter()
         .map(|line| line.parse::<Game>().unwrap())
         .filter(|game| game.is_possible(12, 13, 14))
         .map(|game| game.id)
-        .sum();
+        .sum()
 }
 
 pub fn solve_part_2(input: &str) -> usize {
-    return input
+    input
         .lines()
         .into_iter()
         .map(|line| line.parse::<Game>().unwrap())
         .map(|game| game.power_level())
-        .sum();
+        .sum()
 }
 
 #[cfg(test)]
