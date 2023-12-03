@@ -27,6 +27,17 @@ impl Point {
     pub fn manhattan_distance(&self, other_point: &Point) -> usize {
         (self.x - other_point.x).abs() as usize + (self.y - other_point.y).abs() as usize
     }
+
+    pub fn is_touching(&self, other: Point) -> bool {
+        (self.x == other.x + 1 && self.y == other.y + 1)
+            || (self.x == other.x + 1 && self.y == other.y)
+            || (self.x == other.x + 1 && self.y == other.y - 1)
+            || (self.x == other.x && self.y == other.y + 1)
+            || (self.x == other.x && self.y == other.y - 1)
+            || (self.x == other.x - 1 && self.y == other.y + 1)
+            || (self.x == other.x - 1 && self.y == other.y)
+            || (self.x == other.x - 1 && self.y == other.y - 1)
+    }
 }
 
 #[cfg(test)]
