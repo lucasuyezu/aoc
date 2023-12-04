@@ -21,7 +21,7 @@ impl Card {
             return 0;
         }
 
-        (2 as usize).pow((count as u32) - 1)
+        2_usize.pow((count as u32) - 1)
     }
 }
 
@@ -36,17 +36,13 @@ impl FromStr for Card {
         let (win_numbers_str, hand_numbers_str) = numbers_str.split_once("|").unwrap();
 
         let mut win_numbers: HashSet<usize> = HashSet::new();
-        for s in win_numbers_str.trim().split(" ") {
-            if s != "" {
-                win_numbers.insert(s.parse::<usize>().unwrap());
-            }
+        for s in win_numbers_str.trim().split(" ").filter(|s| s != &"") {
+            win_numbers.insert(s.parse::<usize>().unwrap());
         }
 
         let mut hand_numbers: HashSet<usize> = HashSet::new();
-        for s in hand_numbers_str.trim().split(" ") {
-            if s != "" {
-                hand_numbers.insert(s.parse::<usize>().unwrap());
-            }
+        for s in hand_numbers_str.trim().split(" ").filter(|s| s != &"") {
+            hand_numbers.insert(s.parse::<usize>().unwrap());
         }
 
         Ok(Card {
@@ -75,10 +71,10 @@ pub fn solve_part_2(input: &str) -> usize {
     }
 
     for card in cards.iter() {
-        for i in (card.id + 1)..(card.id + 1 + card.matching_numbers_count()) {
+        for dst_card_id in (card.id + 1)..(card.id + 1 + card.matching_numbers_count()) {
             let src_card_count = cards_count_map.get(&card.id).unwrap();
-            let dst_card_count = cards_count_map.get(&i).unwrap();
-            cards_count_map.insert(i, src_card_count + dst_card_count);
+            let dst_card_count = cards_count_map.get(&dst_card_id).unwrap();
+            cards_count_map.insert(dst_card_id, src_card_count + dst_card_count);
         }
     }
 
