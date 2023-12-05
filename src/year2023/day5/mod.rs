@@ -1,12 +1,13 @@
-use std::{collections::HashSet, str::FromStr};
+use std::{ops::Range, str::FromStr};
 
 use crate::utils::ParseInputError;
 
+use rayon::prelude::*;
+
 #[derive(Debug)]
 pub struct Pah {
-    pub src_range_start: usize,
+    pub src_range: Range<usize>,
     pub dst_range_start: usize,
-    pub range_size: usize,
 }
 
 impl FromStr for Pah {
@@ -19,31 +20,21 @@ impl FromStr for Pah {
         let range_size: usize = split.next().unwrap().parse().unwrap();
 
         Ok(Pah {
-            src_range_start,
+            src_range: (src_range_start..(src_range_start + range_size + 1)),
             dst_range_start,
-            range_size,
         })
     }
 }
 
 fn convert(pahs: &Vec<Pah>, idx: &usize) -> usize {
-    let result = if let Some(pah) = pahs
-        .iter()
-        .find(|pah| (pah.src_range_start..(pah.src_range_start + pah.range_size + 1)).contains(idx))
-    {
-        let offset = idx - pah.src_range_start;
-        pah.dst_range_start + offset
-    } else {
-        *idx
-    };
-
-    println!("idx {} -> result {}", idx, result);
-    result
+    match pahs.iter().find(|pah| pah.src_range.contains(idx)) {
+        Some(pah) => pah.dst_range_start + idx - pah.src_range.start,
+        None => *idx,
+    }
 }
 
 #[derive(Debug)]
 pub struct Almanac {
-    pub seeds: HashSet<usize>,
     pub seed_to_soil: Vec<Pah>,
     pub soil_to_fertilizer: Vec<Pah>,
     pub fertilizer_to_water: Vec<Pah>,
@@ -54,19 +45,44 @@ pub struct Almanac {
 }
 
 impl Almanac {
-    pub fn min_location_number(&self) -> usize {
-        let x: Vec<usize> = self.seeds.iter().map(|s| convert(&self.seed_to_soil, s)).collect();
+    pub fn min_location_number(&self, seeds_ranges: &Vec<Range<usize>>) -> usize {
+        println!("Computing seeds...");
 
-        x.iter()
-            .map(|s| convert(&self.soil_to_fertilizer, &s))
+        let seeds: Vec<usize> = seeds_ranges
+            .par_iter()
+            .map(|seed_range| seed_range.clone().collect::<Vec<usize>>())
+            .flatten()
+            .collect();
+        println!("Computed seeds. Computing soils...");
+
+        let soil: Vec<usize> = seeds.par_iter().map(|s| convert(&self.seed_to_soil, s)).collect();
+        println!("Computed soils. Computing fertilizers...");
+
+        let fert: Vec<usize> = soil.par_iter().map(|s| convert(&self.soil_to_fertilizer, &s)).collect();
+        println!("Computed fertilizers. Computing water...");
+
+        let water: Vec<usize> = fert
+            .par_iter()
             .map(|s| convert(&self.fertilizer_to_water, &s))
-            .map(|s| convert(&self.water_to_light, &s))
-            .map(|s| convert(&self.light_to_temp, &s))
-            .map(|s| convert(&self.temp_to_humidity, &s))
+            .collect();
+        println!("Computed water. Computing light...");
+
+        let light: Vec<usize> = water.par_iter().map(|s| convert(&self.water_to_light, &s)).collect();
+        println!("Computed light. Computing temps...");
+
+        let temp: Vec<usize> = light.par_iter().map(|s| convert(&self.light_to_temp, &s)).collect();
+        println!("Computed temps. Computing humidities...");
+
+        let humidity: Vec<usize> = temp.par_iter().map(|s| convert(&self.temp_to_humidity, &s)).collect();
+        println!("Computed humidities. Computing locations...");
+
+        let loc: Vec<usize> = humidity
+            .par_iter()
             .map(|s| convert(&self.humidity_to_loc, &s))
-            .min()
-            .unwrap()
-            .clone()
+            .collect();
+        println!("Computed locations. Find minimum location...");
+
+        loc.iter().min().unwrap().clone()
     }
 }
 
@@ -74,15 +90,7 @@ impl FromStr for Almanac {
     type Err = ParseInputError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (seed_line, rest) = s.split_once("\n").unwrap();
-        let (_, seeds_str) = seed_line.split_once(": ").unwrap();
-
-        let mut seeds = HashSet::new();
-        for s in seeds_str.trim().split(" ") {
-            seeds.insert(s.parse().unwrap());
-        }
-
-        let (seed_soil_str, rest) = rest.split_once("\n\n").unwrap();
+        let (seed_soil_str, rest) = s.split_once("\n\n").unwrap();
         let seed_to_soil: Vec<Pah> = build_vec_pah(seed_soil_str);
 
         let (soil_to_fertilizer_str, rest) = rest.split_once("\n\n").unwrap();
@@ -103,7 +111,6 @@ impl FromStr for Almanac {
         let humidity_to_loc: Vec<Pah> = build_vec_pah(rest);
 
         Ok(Almanac {
-            seeds,
             seed_to_soil,
             soil_to_fertilizer,
             fertilizer_to_water,
@@ -126,13 +133,36 @@ fn build_vec_pah(s: &str) -> Vec<Pah> {
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    input.parse::<Almanac>().unwrap().min_location_number()
+    let (seed_line, rest) = input.split_once("\n").unwrap();
+    let (_, seeds_str) = seed_line.split_once(": ").unwrap();
+
+    let mut seeds_ranges: Vec<Range<usize>> = vec![];
+    let mut split_iter = seeds_str.trim().split(" ").peekable();
+
+    while let Some(_) = split_iter.peek() {
+        let range_start: usize = split_iter.next().unwrap().parse().unwrap();
+        let range = range_start..(range_start + 1);
+        seeds_ranges.push(range);
+    }
+
+    rest.parse::<Almanac>().unwrap().min_location_number(&seeds_ranges)
 }
 
-pub fn solve_part_2(_input: &str) -> usize {
-    // input.lines().map(|line| line.parse::<Pah>().unwrap())
+pub fn solve_part_2(input: &str) -> usize {
+    let (seed_line, rest) = input.split_once("\n").unwrap();
+    let (_, seeds_str) = seed_line.split_once(": ").unwrap();
 
-    0
+    let mut seeds_ranges: Vec<Range<usize>> = vec![];
+    let mut split_iter = seeds_str.trim().split(" ").peekable();
+
+    while let Some(_) = split_iter.peek() {
+        let range_start: usize = split_iter.next().unwrap().parse().unwrap();
+        let range_size: usize = split_iter.next().unwrap().parse().unwrap();
+        let range = range_start..(range_start + range_size);
+        seeds_ranges.push(range);
+    }
+
+    rest.parse::<Almanac>().unwrap().min_location_number(&seeds_ranges)
 }
 
 #[cfg(test)]
@@ -149,11 +179,11 @@ mod tests {
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2(&include_str!("test_input")), 30);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 46);
     }
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("input")), 8_172_507);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 11_611_182);
     }
 }
