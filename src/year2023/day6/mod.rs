@@ -7,12 +7,18 @@ pub struct Race {
 }
 impl Race {
     fn winning_settings_count(&self) -> usize {
-        let distances: Vec<usize> = (1..self.time + 1)
-            .map(|speed| speed * (self.time - speed))
-            .filter(|distance| *distance > self.distance)
-            .collect();
+        // find idx where we start winning
+        let idx_start = (1..self.time + 1)
+            .position(|speed| speed * (self.time - speed) > self.distance)
+            .unwrap()
+            + 1;
 
-        distances.len()
+        // find idx where we stop winning
+        let count = (idx_start..self.time + 1)
+            .position(|speed| speed * (self.time - speed) <= self.distance)
+            .unwrap();
+
+        count
     }
 }
 
