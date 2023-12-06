@@ -22,7 +22,7 @@ impl Race {
     }
 }
 
-fn parse_input(input: &str) -> Vec<Race> {
+fn parse_part_1_input(input: &str) -> Vec<Race> {
     let re = Regex::new(r"\s+").unwrap();
     let (times_str, distances_str) = input.split_once("\n").unwrap();
     let times: Vec<usize> = re
@@ -47,13 +47,13 @@ fn parse_input(input: &str) -> Vec<Race> {
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    parse_input(input)
+    parse_part_1_input(input)
         .iter()
         .map(|race| race.winning_settings_count())
         .fold(1, |acc, x| acc * x)
 }
 
-pub fn solve_part_2(input: &str) -> usize {
+fn parse_part_2_input(input: &str) -> Race {
     let re = Regex::new(r"\s").unwrap();
     let (time_str, distance_str) = input.split_once("\n").unwrap();
     let wtf = re.replace_all(time_str, "");
@@ -62,9 +62,11 @@ pub fn solve_part_2(input: &str) -> usize {
     let wtf = re.replace_all(distance_str, "");
     let distance: usize = wtf.split_once(":").unwrap().1.parse().unwrap();
 
-    let race = Race { time, distance };
+    Race { time, distance }
+}
 
-    race.winning_settings_count()
+pub fn solve_part_2(input: &str) -> usize {
+    parse_part_2_input(input).winning_settings_count()
 }
 
 #[cfg(test)]
