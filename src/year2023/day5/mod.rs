@@ -1,3 +1,4 @@
+// TODO: Invert lookup and go from loc->...-> seed. Combine it with binary search.
 use std::{ops::Range, str::FromStr};
 
 use crate::utils::ParseInputError;
@@ -53,8 +54,12 @@ impl Almanac {
             .map(|seed_range| seed_range.clone().collect::<Vec<usize>>())
             .flatten()
             .collect();
-        println!("Computed seeds. Computing soils...");
+        println!("Computed seeds.");
 
+        println!("Min seed is {}", seeds.iter().min().unwrap());
+        println!("Max seed is {}", seeds.iter().max().unwrap());
+
+        println!("Computing soils...");
         let soil: Vec<usize> = seeds.par_iter().map(|s| convert(&self.seed_to_soil, s)).collect();
         println!("Computed soils. Computing fertilizers...");
 
