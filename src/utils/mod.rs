@@ -1,4 +1,3 @@
-pub mod deck;
 pub mod point;
 pub mod snafu;
 

@@ -1,26 +1,34 @@
-use self::hand::Hand;
+use self::camel_poker::Hand;
 
-mod camel_cards;
-mod hand;
+mod camel_poker;
 
 pub fn solve_part_1(input: &str) -> usize {
     let mut hands: Vec<Hand> = input
+        .replace("A", "F")
+        .replace("K", "E")
+        .replace("Q", "D")
+        .replace("J", "C")
+        .replace("T", "B")
         .lines()
-        .enumerate()
-        .map(|(i, line)| format!("{i} {line}").parse::<Hand>().unwrap())
+        .map(|line| line.parse::<Hand>().unwrap())
         .collect();
-    hands.sort_by(camel_cards::cmp);
+
+    hands.sort();
     hands.iter().enumerate().map(|(i, hand)| hand.bid * (i + 1)).sum()
 }
 
 pub fn solve_part_2(input: &str) -> usize {
     let mut hands: Vec<Hand> = input
-        .replace("J", "X")
+        .replace("A", "F")
+        .replace("K", "E")
+        .replace("Q", "D")
+        .replace("T", "B")
+        .replace("J", "0")
         .lines()
-        .enumerate()
-        .map(|(i, line)| format!("{i} {line}").parse::<Hand>().unwrap())
+        .map(|line| line.parse::<Hand>().unwrap())
         .collect();
-    hands.sort_by(camel_cards::cmp);
+
+    hands.sort();
     hands.iter().enumerate().map(|(i, hand)| hand.bid * (i + 1)).sum()
 }
 
