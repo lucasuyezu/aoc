@@ -1,117 +1,143 @@
 use std::{cmp::Ordering, collections::HashMap};
 
-use crate::utils::{
-    self,
-    deck::card::{Card, Rank},
+use crate::{
+    utils::{self, deck::card::Rank},
+    year2023::day7::hand::card_strength,
 };
 
-#[derive(Debug)]
-pub struct Hand {
-    pub cards: Vec<Card>,
-    pub bid: usize,
-}
+use super::hand::{Hand, HandType};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum HandType {
-    FiveOfAKind = 7,
-    FourOfAKind = 6,
-    FullHouse = 5,
-    ThreeOfAKind = 4,
-    TwoPair = 3,
-    OnePair = 2,
-    HighCard = 1,
-}
+pub fn cmp(hand_a: &Hand, hand_b: &Hand) -> Ordering {
+    let hand_type_a = hand_type(hand_a);
+    // dbg!(&hand_a);
+    // dbg!(&hand_type_a);
+    let hand_type_b = hand_type(hand_b);
+    // dbg!(&hand_b);
+    // dbg!(&hand_type_b);
 
-fn card_strength(card: &Card) -> usize {
-    match &card.rank {
-        utils::deck::card::Rank::TWO => 2,
-        utils::deck::card::Rank::THREE => 3,
-        utils::deck::card::Rank::FOUR => 4,
-        utils::deck::card::Rank::FIVE => 5,
-        utils::deck::card::Rank::SIX => 6,
-        utils::deck::card::Rank::SEVEN => 7,
-        utils::deck::card::Rank::EIGHT => 8,
-        utils::deck::card::Rank::NINE => 9,
-        utils::deck::card::Rank::TEN => 10,
-        utils::deck::card::Rank::JACK => 11,
-        utils::deck::card::Rank::QUEEN => 12,
-        utils::deck::card::Rank::KING => 13,
-        utils::deck::card::Rank::ACE => 14,
+    let hands = hand_type_a.cmp(&hand_type_b);
+    if hands != Ordering::Equal {
+        return hands;
     }
-}
 
-impl Hand {
-    pub fn hand_type(&self) -> HandType {
-        let mut card_groups: HashMap<&Rank, usize> = HashMap::new();
-
-        for card in self.cards.iter() {
-            card_groups
-                .entry(&card.rank)
-                .and_modify(|count| *count += 1)
-                .or_insert(1);
+    for (i, card_a) in hand_a.cards.iter().enumerate() {
+        let card_b = hand_b.cards.get(i).unwrap();
+        // println!("Comparing {:?} with {:?}", card_a, card_b);
+        let strenghts = card_strength(card_a).cmp(&card_strength(card_b));
+        if strenghts != Ordering::Equal {
+            return strenghts;
+        } else {
         }
-
-        let mut hands: Vec<&usize> = card_groups.values().collect();
-        hands.sort();
-
-        let max_hand = hands.iter().max().unwrap();
-
-        if **max_hand == 5 {
-            return HandType::FiveOfAKind;
-        }
-
-        if **max_hand == 4 {
-            return HandType::FourOfAKind;
-        }
-
-        if hands == vec![&2, &3] {
-            return HandType::FullHouse;
-        }
-
-        if **max_hand == 3 {
-            return HandType::ThreeOfAKind;
-        }
-
-        if hands == vec![&1, &2, &2] {
-            return HandType::TwoPair;
-        }
-
-        if **max_hand == 2 {
-            return HandType::OnePair;
-        }
-
-        HandType::HighCard
     }
+
+    Ordering::Equal
 }
 
-impl PartialEq for Hand {
-    fn eq(&self, other: &Self) -> bool {
-        self.hand_type().eq(&other.hand_type())
+pub fn hand_type(hand: &Hand) -> HandType {
+    let card_groupings = hand.card_groupings();
+    dbg!(&card_groupings);
+
+    let card_groupings_without_jokers: HashMap<Rank, usize> = hand
+        .card_groupings()
+        .into_iter()
+        .filter(|(rank, _)| *rank != utils::deck::card::Rank::JOKER)
+        .collect();
+    dbg!(&card_groupings_without_jokers);
+
+    let mut hands: Vec<&usize> = card_groupings.values().collect();
+    hands.sort();
+    dbg!(&hands);
+
+    let hands_without_jokers = card_groupings_without_jokers.values().collect::<Vec<&usize>>();
+    dbg!(&hands_without_jokers);
+
+    let max_hand_without_jokers: usize = *card_groupings_without_jokers.values().max().unwrap_or(&&0);
+    dbg!(&max_hand_without_jokers);
+
+    let jokers = *card_groupings.get(&utils::deck::card::Rank::JOKER).unwrap_or(&0);
+    dbg!(&jokers);
+
+    if max_hand_without_jokers + jokers == 5 {
+        return HandType::FiveOfAKind;
     }
-}
 
-impl Eq for Hand {}
-
-impl PartialOrd for Hand {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let hand_types = self.hand_type().cmp(&other.hand_type());
-        if hand_types != Ordering::Equal {
-            return Some(hand_types);
-        }
-
-        for (i, card) in self.cards.iter().enumerate() {
-            let strenghts = card_strength(card).cmp(&card_strength(&other.cards.get(i).unwrap()));
-            if strenghts != Ordering::Equal {
-                return Some(strenghts);
-            }
-        }
-
-        Some(Ordering::Equal)
+    if max_hand_without_jokers + jokers == 4 {
+        return HandType::FourOfAKind;
     }
+
+    if (hands == vec![&2, &3]) || (hands_without_jokers == vec![&2, &2] && jokers == 1) {
+        return HandType::FullHouse;
+    }
+
+    if max_hand_without_jokers + jokers == 3 {
+        return HandType::ThreeOfAKind;
+    }
+
+    if hands == vec![&1, &2, &2] {
+        return HandType::TwoPair;
+    }
+
+    if max_hand_without_jokers + jokers == 2 {
+        return HandType::OnePair;
+    }
+
+    HandType::HighCard
 }
 
-impl Ord for Hand {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+#[cfg(test)]
+mod tests {
+    use std::cmp::Ordering;
+
+    use crate::year2023::day7::{
+        camel_cards,
+        hand::{Hand, HandType},
+    };
+    #[test]
+    fn cmp() {
+        let hand_a = "1 T3Q33 11".parse::<Hand>().unwrap();
+        let hand_b = "1 T3T3X 17".parse::<Hand>().unwrap();
+        assert_eq!(super::cmp(&hand_a, &hand_b), Ordering::Less);
+    }
+
+    #[test]
+    fn hand_types() {
+        let hand = "1 T3Q33 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FullHouse);
+        let hand = "1 T3T3X 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::ThreeOfAKind);
+        let hand = "1 AAAAA 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FiveOfAKind);
+        let hand = "1 AAAAX 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FiveOfAKind);
+        let hand = "1 AAAXX 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FiveOfAKind);
+        let hand = "1 AAXXX 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FiveOfAKind);
+        let hand = "1 AXXXX 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FiveOfAKind);
+        let hand = "1 XXXXX 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FiveOfAKind);
+        let hand = "1 AAAA2 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FourOfAKind);
+        let hand = "1 AAAX2 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FourOfAKind);
+        let hand = "1 AAXX2 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FourOfAKind);
+        let hand = "1 AXXX2 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FourOfAKind);
+        let hand = "1 AXXX2 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FourOfAKind);
+        let hand = "1 AAA22 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::FullHouse);
+        let hand = "1 AAA23 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::ThreeOfAKind);
+        let hand = "1 AA23X 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::ThreeOfAKind);
+        let hand = "1 AA223 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::TwoPair);
+        let hand = "1 A234X 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::OnePair);
+        let hand = "1 A2345 123".parse::<Hand>().unwrap();
+        assert_eq!(camel_cards::hand_type(&hand), HandType::HighCard);
     }
 }
