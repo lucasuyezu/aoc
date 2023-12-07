@@ -1,5 +1,9 @@
+pub mod deck;
 pub mod point;
 pub mod snafu;
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct ParseInputError;
 
 pub fn get_arg(name: &str) -> Option<String> {
     let args: Vec<String> = std::env::args().collect();
