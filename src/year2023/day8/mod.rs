@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::utils::lcm;
+use std::collections::HashMap;
 
 fn parse_input(input: &str) -> (String, HashMap<String, (String, String)>) {
     let (turns_str, rest) = input.split_once("\n\n").unwrap();
@@ -51,21 +51,33 @@ pub fn solve_part_2(input: &str) -> usize {
     let steps: Vec<usize> = start_nodes
         .into_iter()
         .map(|start_node| {
+            let mut nodes_visited: HashMap<String, usize> = HashMap::new();
             let mut current_node = start_node;
-            let mut steps_count = 0;
-            let mut turn_chars = turns_str.chars().cycle();
-            while !current_node.ends_with("Z") {
-                let current_turn = turn_chars.next().unwrap();
-                current_node = match current_turn {
-                    'L' => node_hash.get(&current_node).unwrap().0.clone(),
-                    'R' => node_hash.get(&current_node).unwrap().1.clone(),
-                    _ => panic!("Invalid turn"),
-                };
+            let mut cur_step = 0;
+            let mut cycling = false;
+            let mut turn_chars = turns_str.chars().cycle().enumerate();
+            while !cycling {
+                let (i, current_turn) = turn_chars.next().unwrap();
+                let direction_idx = i % turns_str.len();
+                let key = format!("{current_node}-{direction_idx}");
 
-                steps_count += 1;
+                if nodes_visited.contains_key(&key) {
+                    cycling = true;
+                    cur_step -= nodes_visited.get(&key).unwrap();
+                } else {
+                    nodes_visited.insert(key, cur_step);
+
+                    current_node = match current_turn {
+                        'L' => node_hash.get(&current_node).unwrap().0.clone(),
+                        'R' => node_hash.get(&current_node).unwrap().1.clone(),
+                        _ => panic!("Invalid turn"),
+                    };
+
+                    cur_step += 1;
+                }
             }
 
-            steps_count
+            cur_step
         })
         .collect();
 
