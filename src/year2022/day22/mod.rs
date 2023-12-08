@@ -72,8 +72,7 @@ fn solve(grid: Grid, instructions: Vec<Instruction>, is_grid: bool) -> usize {
             }
             Instruction::Move(steps) => {
                 for _ in 0..steps {
-                    let (next_row, next_col, next_direction) =
-                        next_position(&grid, row, col, direction, is_grid);
+                    let (next_row, next_col, next_direction) = next_position(&grid, row, col, direction, is_grid);
 
                     if grid[next_row][next_col] == '#' {
                         break;
@@ -90,13 +89,7 @@ fn solve(grid: Grid, instructions: Vec<Instruction>, is_grid: bool) -> usize {
     1000 * (row + 1) + 4 * (col + 1) + direction as usize
 }
 
-fn next_position(
-    grid: &Grid,
-    row: usize,
-    col: usize,
-    direction: isize,
-    is_grid: bool,
-) -> (usize, usize, isize) {
+fn next_position(grid: &Grid, row: usize, col: usize, direction: isize, is_grid: bool) -> (usize, usize, isize) {
     if is_at_border(grid, row, col, direction) {
         if is_grid {
             wrap_around_grid(&grid, row, col, direction)
@@ -124,12 +117,7 @@ fn is_at_border(grid: &Grid, row: usize, col: usize, direction: isize) -> bool {
     }
 }
 
-fn wrap_around_grid(
-    grid: &Grid,
-    row: usize,
-    col: usize,
-    direction: isize,
-) -> (usize, usize, isize) {
+fn wrap_around_grid(grid: &Grid, row: usize, col: usize, direction: isize) -> (usize, usize, isize) {
     let mut next_row = row;
     let mut next_col = col;
 

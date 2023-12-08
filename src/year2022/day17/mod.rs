@@ -16,11 +16,11 @@ enum RockShape {
 impl RockShape {
     fn from(n: usize) -> RockShape {
         match n % 5 {
-            1 => RockShape::Minus,
-            2 => RockShape::Plus,
-            3 => RockShape::L,
-            4 => RockShape::I,
-            0 => RockShape::Square,
+            0 => RockShape::Minus,
+            1 => RockShape::Plus,
+            2 => RockShape::L,
+            3 => RockShape::I,
+            4 => RockShape::Square,
             _ => panic!("Invalid n for get_rock"),
         }
     }
@@ -84,20 +84,38 @@ impl Grid {
     }
 
     fn animate(&mut self, input: &str, rock_count: usize) {
-        let mut chars = input.chars().cycle();
+        let mut jet_id = 0;
+        let mut jet_direction;
+        let mut chars = input.chars().enumerate().cycle();
+        let mut cache: HashMap<(usize, usize), (usize, usize)> = HashMap::new();
 
-        for i in 1..=rock_count {
-            let current_rock = RockShape::from(i);
-            let rock_starting_points =
-                current_rock.get_starting_points(if i == 1 { -1 } else { self.max_y });
+        for piece_id in 0..rock_count {
+            if piece_id == 200 {
+                dbg!(piece_id);
+                dbg!()
+            }
+            let cache_key = (piece_id % 5, jet_id % input.len());
+            if cache.contains_key(&cache_key) {
+                let (s, t) = cache.get(&cache_key).unwrap();
+                let d = (1_000_000_000_000 - s) / (piece_id - s);
+                let m = (1_000_000_000_000 - s) % (piece_id - s);
+                if m == 0 {
+                    dbg!(self.max_y as usize + (self.max_y as usize - t) * d);
+                    panic!();
+                }
+            } else {
+                cache.insert(cache_key, (piece_id, self.max_y as usize));
+            }
+
+            let current_rock = RockShape::from(piece_id);
+            let rock_starting_points = current_rock.get_starting_points(if piece_id == 0 { -1 } else { self.max_y });
 
             let mut rock_top_left = rock_starting_points[0];
 
             self.max_y = rock_top_left.y;
 
             for starting_point in rock_starting_points.iter() {
-                self.stuff_hash
-                    .insert(starting_point.clone(), "@".to_string());
+                self.stuff_hash.insert(starting_point.clone(), "@".to_string());
             }
 
             if let Some(timer_millis) = get_timer_millis() {
@@ -109,14 +127,20 @@ impl Grid {
 
             let mut rock_points = rock_starting_points.clone();
             loop {
-                let direction = chars.next().unwrap();
-                if self.can_move_horizontally(&current_rock, &rock_top_left, direction) {
+                (jet_id, jet_direction) = chars.next().unwrap();
+                if jet_id == 0 {
+                    dbg!(piece_id);
+                    dbg!(piece_id % 5);
+                    dbg!(jet_id);
+                    dbg!(jet_direction);
+                }
+                if self.can_move_horizontally(&current_rock, &rock_top_left, jet_direction) {
                     for old_point in &rock_points {
                         self.stuff_hash.remove(&old_point);
                     }
 
                     for point in rock_points.iter_mut() {
-                        if direction == '<' {
+                        if jet_direction == '<' {
                             point.x -= 1;
                         } else {
                             point.x += 1;
@@ -204,12 +228,7 @@ impl Grid {
         println!("{}", frame);
     }
 
-    fn can_move_horizontally(
-        &self,
-        current_rock: &RockShape,
-        rock_top_left: &Point,
-        c: char,
-    ) -> bool {
+    fn can_move_horizontally(&self, current_rock: &RockShape, rock_top_left: &Point, c: char) -> bool {
         match current_rock {
             RockShape::Minus => {
                 return (c == '<'
@@ -420,14 +439,14 @@ impl Grid {
 
 pub fn solve_part_1(input: &str) -> usize {
     let mut grid = Grid::new();
-
     grid.animate(input, 2022);
-
     grid.max_y as usize + 1
 }
 
-pub fn solve_part_2(_input: &str) -> usize {
-    0
+pub fn solve_part_2(input: &str) -> usize {
+    let mut grid = Grid::new();
+    grid.animate(input, 1_000_000_000_000);
+    grid.max_y as usize + 1
 }
 
 #[cfg(test)]
@@ -444,11 +463,6 @@ mod tests {
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2(&include_str!("test_input")), 0);
-    }
-
-    #[test]
-    fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("input")), 0);
+        assert_eq!(super::solve_part_2(&include_str!("test_input")), 1514285714288);
     }
 }

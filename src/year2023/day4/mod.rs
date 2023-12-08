@@ -29,11 +29,17 @@ impl FromStr for Card {
     type Err = ParseInputError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (card_id_str, numbers_str) = s.split_once(":").unwrap();
+        let (card_id_str, numbers_str) = s.split_once(":").ok_or(ParseInputError)?;
 
-        let id: usize = card_id_str.split_once(" ").unwrap().1.trim().parse().unwrap();
+        let id: usize = card_id_str
+            .split_once(" ")
+            .ok_or(ParseInputError)?
+            .1
+            .trim()
+            .parse()
+            .unwrap();
 
-        let (win_numbers_str, hand_numbers_str) = numbers_str.split_once("|").unwrap();
+        let (win_numbers_str, hand_numbers_str) = numbers_str.split_once("|").ok_or(ParseInputError)?;
 
         let mut win_numbers: HashSet<usize> = HashSet::new();
         for s in win_numbers_str.trim().split(" ").filter(|s| s != &"") {

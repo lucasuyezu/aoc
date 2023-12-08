@@ -169,10 +169,7 @@ pub fn solve_part_2(input: &str) -> usize {
     let grid = Grid::from(input);
 
     let point_a = Point { x: 0, y: 0 };
-    let point_b = Point {
-        x: 4000000,
-        y: 4000000,
-    };
+    let point_b = Point { x: 4000000, y: 4000000 };
 
     match grid.distress_beacon(&point_a, &point_b) {
         Some(beacon_point) => beacon_point.x as usize * 4000000 + beacon_point.y as usize,
@@ -203,19 +200,13 @@ mod tests {
         let grid = Grid::from(&include_str!("test_input"));
         let beacon_point: Point = grid.distress_beacon(&point_a, &point_b).unwrap();
 
-        assert_eq!(
-            beacon_point.x as usize * 4000000 + beacon_point.y as usize,
-            56000011,
-        );
+        assert_eq!(beacon_point.x as usize * 4000000 + beacon_point.y as usize, 56000011,);
     }
 
     #[test]
     fn part2_real_input() {
         let point_a = Point { x: 0, y: 0 };
-        let point_b = Point {
-            x: 4000000,
-            y: 4000000,
-        };
+        let point_b = Point { x: 4000000, y: 4000000 };
         let grid = Grid::from(&include_str!("input"));
         let beacon_point: Point = grid.distress_beacon(&point_a, &point_b).unwrap();
 

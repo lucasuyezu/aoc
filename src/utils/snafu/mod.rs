@@ -63,14 +63,17 @@ impl Display for Snafu {
             rem = (value + 2).rem_euclid(5);
             value = (value + 2) / 5;
 
-            result.insert(0, match rem {
-                0 => '=',
-                1 => '-',
-                2 => '0',
-                3 => '1',
-                4 => '2',
-                d @ _ => panic!("Unsupported rem {}", d),
-            });
+            result.insert(
+                0,
+                match rem {
+                    0 => '=',
+                    1 => '-',
+                    2 => '0',
+                    3 => '1',
+                    4 => '2',
+                    d @ _ => panic!("Unsupported rem {}", d),
+                },
+            );
         }
 
         write!(f, "{}", result)
@@ -97,10 +100,7 @@ mod tests {
         assert_eq!("1-0".parse::<Snafu>().unwrap(), Snafu { value: 20 });
         assert_eq!("1=11-2".parse::<Snafu>().unwrap(), Snafu { value: 2022 });
         assert_eq!("1-0---0".parse::<Snafu>().unwrap(), Snafu { value: 12345 });
-        assert_eq!(
-            "1121-1110-1=0".parse::<Snafu>().unwrap(),
-            Snafu { value: 314159265 }
-        );
+        assert_eq!("1121-1110-1=0".parse::<Snafu>().unwrap(), Snafu { value: 314159265 });
     }
 
     #[test]

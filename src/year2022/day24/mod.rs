@@ -47,7 +47,7 @@ fn parse_input(s: &str) -> (Grid, Vec<Blizzard>, Point, Point) {
     (Grid { max_x, max_y }, blizzards, start, end)
 }
 
-fn print_frame(grid: &Grid, start: &Point, end: &Point, blizzards: &Vec<Blizzard>, pos: &Point) {
+fn _print_frame(grid: &Grid, start: &Point, end: &Point, blizzards: &Vec<Blizzard>, pos: &Point) {
     let mut frame = String::new();
     for x in 0..=grid.max_x {
         for y in 0..=grid.max_y {

@@ -60,18 +60,10 @@ fn solve(monkeys: &HashMap<String, Monkey>, start: String) -> isize {
     let monkey = monkeys.get(&start).unwrap();
     match monkey.job.clone() {
         Job::Number(n) => n,
-        Job::Addition(monkey_a, monkey_b) => {
-            solve(monkeys, monkey_a.clone()) + solve(monkeys, monkey_b.clone())
-        }
-        Job::Subtraction(monkey_a, monkey_b) => {
-            solve(monkeys, monkey_a.clone()) - solve(monkeys, monkey_b.clone())
-        }
-        Job::Multiplication(monkey_a, monkey_b) => {
-            solve(monkeys, monkey_a.clone()) * solve(monkeys, monkey_b.clone())
-        }
-        Job::Division(monkey_a, monkey_b) => {
-            solve(monkeys, monkey_a.clone()) / solve(monkeys, monkey_b.clone())
-        }
+        Job::Addition(monkey_a, monkey_b) => solve(monkeys, monkey_a.clone()) + solve(monkeys, monkey_b.clone()),
+        Job::Subtraction(monkey_a, monkey_b) => solve(monkeys, monkey_a.clone()) - solve(monkeys, monkey_b.clone()),
+        Job::Multiplication(monkey_a, monkey_b) => solve(monkeys, monkey_a.clone()) * solve(monkeys, monkey_b.clone()),
+        Job::Division(monkey_a, monkey_b) => solve(monkeys, monkey_a.clone()) / solve(monkeys, monkey_b.clone()),
     }
 }
 
@@ -100,7 +92,7 @@ pub fn solve_part_2(input: &str) -> isize {
         let mut rhs;
         let humn_left;
 
-        let mut humn = monkeys.get_mut(&"humn".to_string()).unwrap();
+        let humn = monkeys.get_mut(&"humn".to_string()).unwrap();
         humn.job = Job::Number(0);
 
         lhs = solve(&monkeys, monkey_a.clone());
@@ -118,7 +110,7 @@ pub fn solve_part_2(input: &str) -> isize {
         while humn_left && lhs < rhs || !humn_left && lhs > rhs {
             upper_bound *= 2;
 
-            let mut humn = monkeys.get_mut(&"humn".to_string()).unwrap();
+            let humn = monkeys.get_mut(&"humn".to_string()).unwrap();
             humn.job = Job::Number(upper_bound as isize);
 
             lhs = solve(&monkeys, monkey_a.clone());
@@ -127,7 +119,7 @@ pub fn solve_part_2(input: &str) -> isize {
 
         while lhs != rhs {
             x = (lower_bound + upper_bound) / 2;
-            let mut humn = monkeys.get_mut(&"humn".to_string()).unwrap();
+            let humn = monkeys.get_mut(&"humn".to_string()).unwrap();
             humn.job = Job::Number(x as isize);
 
             lhs = solve(&monkeys, monkey_a.clone());

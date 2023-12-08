@@ -9,8 +9,7 @@ use std::{
 use regex::Regex;
 
 lazy_static! {
-    static ref LINE_RE: Regex =
-        Regex::new(r"\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)").unwrap();
+    static ref LINE_RE: Regex = Regex::new(r"\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)\D+(\d+)").unwrap();
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -85,9 +84,7 @@ impl Blueprint {
             return geode_count;
         }
 
-        let upper_bound = geode_count
-            + (geode_robots_count * minutes_left)
-            + (minutes_left * (minutes_left + 1) / 2);
+        let upper_bound = geode_count + (geode_robots_count * minutes_left) + (minutes_left * (minutes_left + 1) / 2);
 
         if upper_bound < *cache.get("best").unwrap() {
             return 0;
@@ -118,9 +115,7 @@ impl Blueprint {
         let new_geode_count = geode_count + geode_robots_count;
 
         // Build a geode robot
-        if ore_count >= self.geode_robot_ore_cost
-            && obsidian_count >= self.geode_robot_obsidian_cost
-        {
+        if ore_count >= self.geode_robot_ore_cost && obsidian_count >= self.geode_robot_obsidian_cost {
             max_geode_count = max_geode_count.max(self.dfs(
                 minutes_left - 1,
                 ore_robots_count,
@@ -157,9 +152,7 @@ impl Blueprint {
 
         // Build a clay robot
         // No need to build a clay robot if I already have enough clay robots to build an obsidian robot
-        if ore_count >= self.clay_robot_ore_cost
-            && clay_robots_count < self.obsidian_robot_clay_cost
-        {
+        if ore_count >= self.clay_robot_ore_cost && clay_robots_count < self.obsidian_robot_clay_cost {
             max_geode_count = max_geode_count.max(self.dfs(
                 minutes_left - 1,
                 ore_robots_count,
@@ -216,10 +209,7 @@ impl Blueprint {
 }
 
 pub fn solve_part_1(input: &str) -> u32 {
-    let blueprints: Vec<Blueprint> = input
-        .lines()
-        .map(|line| line.parse::<Blueprint>().unwrap())
-        .collect();
+    let blueprints: Vec<Blueprint> = input.lines().map(|line| line.parse::<Blueprint>().unwrap()).collect();
 
     let (tx, rx): (Sender<u32>, Receiver<u32>) = mpsc::channel();
     let mut threads = vec![];

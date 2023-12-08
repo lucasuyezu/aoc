@@ -4,11 +4,12 @@
 
 pkgs.mkShell {
   buildInputs = [
-    pkgs.vim
+    pkgs.exa
+    pkgs.git
+    pkgs.neovim
     pkgs.rustc
     pkgs.rustup
     pkgs.rust-analyzer
     pkgs.rustfmt
-    pkgs.git
   ];
 }

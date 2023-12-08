@@ -43,10 +43,7 @@ fn build_instructions(input: &str) -> Vec<Instruction> {
         let argument_str = &line[4..];
         let argument = argument_str.parse::<isize>().unwrap();
 
-        instructions.push(Instruction {
-            opcode,
-            argument,
-        });
+        instructions.push(Instruction { opcode, argument });
     }
 
     instructions
@@ -92,7 +89,7 @@ pub fn solve_part_2(input: &str) -> isize {
 
     for i in 0..instructions.len() {
         let mut program = instructions.clone();
-        let mut instruction = &mut program[i];
+        let instruction = &mut program[i];
 
         if let OpCode::Acc = instruction.opcode {
             continue;
