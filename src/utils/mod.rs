@@ -17,3 +17,16 @@ pub fn get_timer_millis() -> Option<u64> {
     let fps = get_arg("fps")?.parse::<u64>().unwrap();
     Some((1.0 / fps as f32 * 1_000.0) as u64)
 }
+
+pub fn gcd(a: usize, b: usize) -> usize {
+    if b == 0 {
+        return a;
+    }
+
+    gcd(b, a % b)
+}
+ 
+pub fn lcm(arr: &[usize]) -> usize {
+    arr.iter().fold(arr[0], |acc, num| (acc * num) / (gcd(*num, acc)))
+}
+
