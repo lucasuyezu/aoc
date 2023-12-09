@@ -1,10 +1,3 @@
-fn parse_input(input: &str) -> Vec<Vec<isize>> {
-    input
-        .lines()
-        .map(|line| line.split(" ").map(|n| n.parse().unwrap()).collect())
-        .collect()
-}
-
 fn calculate_sequences(history: Vec<isize>) -> Vec<Vec<isize>> {
     let mut levels: Vec<Vec<isize>> = vec![];
     levels.push(history.clone());
@@ -26,27 +19,28 @@ fn calculate_sequences(history: Vec<isize>) -> Vec<Vec<isize>> {
 }
 
 pub fn solve_part_1(input: &str) -> isize {
-    parse_input(input)
-        .into_iter()
+    input
+        .lines()
+        .map(|line| line.split(" ").map(|n| n.parse().unwrap()).collect())
         .map(calculate_sequences)
         .map(|levels| levels.iter().map(|level| *level.last().unwrap()).sum::<isize>())
         .sum()
 }
 
 pub fn solve_part_2(input: &str) -> isize {
-    parse_input(input)
-        .into_iter()
+    input
+        .lines()
+        .map(|line| line.split(" ").map(|n| n.parse().unwrap()).collect())
         .map(calculate_sequences)
-        .map(|mut levels| {
-            levels.reverse();
+        .map(|levels| {
+            let firsts: Vec<isize> = levels.iter().rev().map(|level| *level.first().unwrap()).collect();
 
+            let mut result = 0;
             for i in 1..levels.len() {
-                let x = levels.get(i - 1).unwrap().first().unwrap().clone();
-                let level = levels.get_mut(i).unwrap();
-                level.insert(0, level.first().unwrap() - x);
+                result = firsts.get(i).unwrap() - result;
             }
 
-            *levels.last().unwrap().first().unwrap()
+            result
         })
         .sum()
 }
