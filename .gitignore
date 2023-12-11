@@ -65,7 +65,8 @@ tags
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,vim,rust
 
-**/*input
+**/input*
+**/test_input*
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode
