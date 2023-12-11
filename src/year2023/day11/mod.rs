@@ -1,146 +1,78 @@
-use std::collections::{HashSet, VecDeque};
-
-use crate::utils::point::{Point, EAST, NORTH, SOUTH, WEST};
+use crate::utils::point::Point;
 use itertools::Itertools;
 
-pub struct Universe {
-    data: Vec<Vec<char>>,
-}
-impl Universe {
-    fn expand(&mut self) {
-        let x_len = self.data.len();
-        let y_len = self.data.first().unwrap().len();
-
-        let empty_lines: Vec<usize> = (0..x_len)
-            .filter(|x| self.data.get(*x).unwrap().iter().all(|c| *c == '.'))
-            .collect();
-
-        // dbg!(&empty_lines);
-
-        let empty_columns: Vec<usize> = (0..y_len)
-            .filter(|y| (0..x_len).all(|x| *self.data.get(x).unwrap().get(*y).unwrap() == '.'))
-            .collect();
-
-        // dbg!(&empty_columns);
-
-        // print(self);
-
-        for (offset, x) in empty_lines.iter().enumerate() {
-            // println!("Inserting an empty line at x {}", x + offset);
-            let line = self.data.get(x + offset).unwrap().clone();
-            self.data.insert(x + offset, line);
-        }
-
-        // print(self);
-
-        for (offset, y) in empty_columns.iter().enumerate() {
-            for x in 0..(x_len + empty_lines.len()) {
-                // println!("Inserting a dot at {}-{}", x, y + offset);
-                self.data.get_mut(x).unwrap().insert(y + offset, '.');
+fn parse_input(input: &str, expansion_factor: usize) -> Vec<Point> {
+    let mut galaxies: Vec<Point> = vec![];
+    for (x, row) in input.lines().enumerate() {
+        for (y, c) in row.chars().enumerate() {
+            if c == '#' {
+                galaxies.push(Point {
+                    x: (x as isize) + 1,
+                    y: (y as isize) + 1,
+                });
             }
         }
-
-        // print(self);
     }
 
-    fn galaxies(&self) -> Vec<Point> {
-        let mut result: Vec<Point> = vec![];
-        for (x, line) in self.data.iter().enumerate() {
-            for (y, c) in line.iter().enumerate() {
-                if *c == '#' {
-                    result.push(Point {
-                        x: x as isize,
-                        y: y as isize,
-                    });
-                }
-            }
+    let x_len = input.lines().count();
+    let y_len = input.lines().next().unwrap().len();
+
+    let empty_rows: Vec<usize> = input
+        .lines()
+        .enumerate()
+        .filter(|(_, line)| line.chars().all(|c| c == '.'))
+        .map(|(x, _)| x + 1)
+        .collect();
+
+    let empty_cols: Vec<usize> = (0..y_len)
+        .filter(|y| (0..x_len).all(|x| input.lines().nth(x).unwrap().chars().nth(*y).unwrap() == '.'))
+        .map(|y| y + 1)
+        .collect();
+
+    for (offset, x) in empty_rows.iter().enumerate() {
+        let min_x = x + offset * expansion_factor;
+        for galaxy in galaxies.iter_mut().filter(|galaxy| galaxy.x as usize >= min_x) {
+            galaxy.x += expansion_factor as isize;
         }
-
-        result
     }
 
-    fn shortest_distance(&self, pair: Vec<&Point>) -> usize {
-        let x_len = self.data.len();
-        let y_len = self.data.get(0).unwrap().len();
-
-        let start = **pair.get(0).unwrap();
-        let end = **pair.get(1).unwrap();
-        println!("Calculating shortest distance between {:?} and {:?}", start, end);
-
-        let mut visited: HashSet<Point> = HashSet::new();
-        let mut queue: VecDeque<(Point, usize)> = VecDeque::new();
-
-        queue.push_back((start, 0));
-        visited.insert(start);
-
-        while let Some((current, current_distance)) = queue.pop_front() {
-            if current == end {
-                return current_distance;
-            }
-
-            let north = current + NORTH;
-            if north.x >= 0 && !visited.contains(&north) {
-                queue.push_back((north, current_distance + 1));
-                visited.insert(north);
-            }
-
-            let east = current + EAST;
-            if east.y < y_len as isize && !visited.contains(&east) {
-                queue.push_back((east, current_distance + 1));
-                visited.insert(east);
-            }
-
-            let south = current + SOUTH;
-            if south.y < x_len as isize && !visited.contains(&south) {
-                queue.push_back((south, current_distance + 1));
-                visited.insert(south);
-            }
-
-            let west = current + WEST;
-            if west.y >= 0 && !visited.contains(&west) {
-                queue.push_back((west, current_distance + 1));
-                visited.insert(west);
-            }
+    for (offset, y) in empty_cols.iter().enumerate() {
+        let min_y = y + offset * expansion_factor;
+        for galaxy in galaxies.iter_mut().filter(|galaxy| galaxy.y as usize >= min_y) {
+            galaxy.y += expansion_factor as isize;
         }
-
-        0
     }
-}
 
-fn print(universe: &Universe) {
-    for line in universe.data.iter() {
-        for c in line {
-            print!("{}", c);
-        }
-        println!();
-    }
-}
-
-fn parse_part_1_input(input: &str) -> Universe {
-    Universe {
-        data: input.lines().map(|line| line.chars().collect()).collect(),
-    }
+    galaxies
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    let mut universe = parse_part_1_input(input);
-    universe.expand();
+    let galaxies = parse_input(input, 1);
 
-    let galaxies = universe.galaxies();
     galaxies
         .iter()
         .combinations(2)
         .unique()
-        .map(|pair| universe.shortest_distance(pair))
+        .map(|pair| pair[0].manhattan_distance(pair[1]))
         .sum()
 }
 
-pub fn solve_part_2(_input: &str) -> usize {
-    0
+pub fn solve_part_2(input: &str) -> usize {
+    let galaxies = parse_input(input, 999_999);
+
+    galaxies
+        .iter()
+        .combinations(2)
+        .unique()
+        .map(|pair| pair[0].manhattan_distance(pair[1]))
+        .sum()
 }
 
 #[cfg(test)]
 mod tests {
+    use super::parse_input;
+    use itertools::Itertools;
+
     #[test]
     fn part1_test_input() {
         assert_eq!(super::solve_part_1(&include_str!("test_input")), 374);
@@ -153,11 +85,31 @@ mod tests {
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2(&include_str!("test_input")), 71_503);
+        let galaxies = parse_input(&include_str!("test_input"), 9);
+
+        let x: usize = galaxies
+            .iter()
+            .combinations(2)
+            .unique()
+            .map(|pair| pair.get(0).unwrap().manhattan_distance(pair.get(1).unwrap()))
+            .sum();
+
+        assert_eq!(x, 1030);
+
+        let galaxies = parse_input(&include_str!("test_input"), 99);
+
+        let x: usize = galaxies
+            .iter()
+            .combinations(2)
+            .unique()
+            .map(|pair| pair.get(0).unwrap().manhattan_distance(pair.get(1).unwrap()))
+            .sum();
+
+        assert_eq!(x, 8410);
     }
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("input")), 34_655_848);
+        assert_eq!(super::solve_part_2(&include_str!("input")), 790_194_712_336);
     }
 }
