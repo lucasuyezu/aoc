@@ -75,17 +75,17 @@ mod tests {
 
     #[test]
     fn part1_test_input() {
-        assert_eq!(super::solve_part_1(&include_str!("test_input")), 374);
+        assert_eq!(super::solve_part_1(&include_str!("day11/test_input")), 374);
     }
 
     #[test]
     fn part1_real_input() {
-        assert_eq!(super::solve_part_1(&include_str!("input")), 10_292_708);
+        assert_eq!(super::solve_part_1(&include_str!("day11/input")), 10_292_708);
     }
 
     #[test]
     fn part2_test_input() {
-        let galaxies = parse_input(&include_str!("test_input"), 9);
+        let galaxies = parse_input(&include_str!("day11/test_input"), 9);
 
         let x: usize = galaxies
             .iter()
@@ -96,7 +96,7 @@ mod tests {
 
         assert_eq!(x, 1030);
 
-        let galaxies = parse_input(&include_str!("test_input"), 99);
+        let galaxies = parse_input(&include_str!("day11/test_input"), 99);
 
         let x: usize = galaxies
             .iter()
@@ -110,6 +110,6 @@ mod tests {
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("input")), 790_194_712_336);
+        assert_eq!(super::solve_part_2(&include_str!("day11/input")), 790_194_712_336);
     }
 }
