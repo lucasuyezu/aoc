@@ -25,8 +25,17 @@ pub fn gcd(a: usize, b: usize) -> usize {
 
     gcd(b, a % b)
 }
- 
+
 pub fn lcm(arr: &[usize]) -> usize {
     arr.iter().fold(arr[0], |acc, num| (acc * num) / (gcd(*num, acc)))
 }
 
+pub fn print_2d_vec(vec: &Vec<Vec<char>>) {
+    for x in 0..vec.len() {
+        for y in 0..vec[x].len() {
+            print!("{}", vec[x][y]);
+        }
+        println!();
+    }
+    println!();
+}
