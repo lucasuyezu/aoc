@@ -1,7 +1,5 @@
 use itertools::Itertools;
 
-use crate::utils::print_2d_vec;
-
 type Table = Vec<Vec<char>>;
 
 fn parse_input(input: &str) -> Vec<Table> {
@@ -17,93 +15,97 @@ fn parse_input(input: &str) -> Vec<Table> {
 }
 
 fn cols_equal(table: &Table, i: usize, j: usize) -> bool {
-    println!("Comparing cols {} and {}", i, j);
-    (0..table.len()).all(|x| {
-        // dbg!(table[x][i]);
-        // dbg!(table[x][j]);
-        table[x][i] == table[x][j]
-    })
+    (0..table.len()).all(|x| table[x][i] == table[x][j])
 }
 
 fn rows_equal(table: &Table, i: usize, j: usize) -> bool {
-    println!("Comparing rows {} and {}", i, j);
     table[i] == table[j]
 }
 
-fn solve(tuple: (usize, &Table)) -> usize {
-    let (i, table) = tuple;
-    println!();
-    println!("Processing table {}", i);
-
-    print_2d_vec(table);
-
+fn solve(
+    table: &Table,
+    ignore_x: Option<usize>,
+    ignore_y: Option<usize>,
+) -> Option<(Option<usize>, Option<usize>, usize)> {
+    // TODO: Transpose and DRY this.
     let x_len = table.len();
     let y_len = table[0].len();
 
-    dbg!(x_len);
-    dbg!(y_len);
+    if let Some(y) = (0..y_len - 1).filter(|y| cols_equal(table, *y, y + 1)).find(|y| {
+        let mut mirror = true;
 
-    if let Some(col) = (0..y_len - 1)
-        .filter(|col| cols_equal(table, *col, col + 1))
-        .find(|col| {
-            println!("Cols {} and {} are equal", col, col + 1);
-            let mut mirror = true;
-
-            let mut offset = 1;
-            while mirror && *col >= offset && col + offset + 1 < y_len {
-                if !cols_equal(table, col - offset, col + 1 + offset) {
-                    println!("Cols {} and {} are NOT mirrored", col - offset, col + offset + 1);
-                    mirror = false;
-                }
-                offset += 1;
-                dbg!(offset);
+        let mut offset = 1;
+        while mirror && *y >= offset && y + offset + 1 < y_len {
+            if !cols_equal(table, y - offset, y + 1 + offset) {
+                mirror = false;
             }
+            offset += 1;
+        }
 
-            if mirror {
-                println!("Mirrored at cols {} and {}", col, col + 1);
-            }
+        if mirror && ignore_y.is_some() && ignore_y.unwrap() == *y {
+            mirror = false;
+        }
 
-            mirror
-        })
-    {
-        return col + 1;
+        mirror
+    }) {
+        return Some((None, Some(y), y + 1));
     }
 
-    if let Some(row) = (0..x_len - 1)
-        .filter(|row| rows_equal(table, *row, row + 1))
-        .find(|row| {
-            println!("Rows {} and {} are equal", row, row + 1);
-            let mut mirror = true;
+    if let Some(x) = (0..x_len - 1).filter(|y| rows_equal(table, *y, y + 1)).find(|x| {
+        let mut mirror = true;
 
-            let mut offset = 1;
-            while mirror && *row >= offset && row + offset + 1 < x_len {
-                if !rows_equal(table, row - offset, row + 1 + offset) {
-                    println!("Rows {} and {} are NOT mirrored", row - offset, row + offset);
-                    mirror = false;
-                }
-                offset += 1;
-                dbg!(offset);
+        let mut offset = 1;
+        while mirror && *x >= offset && x + offset + 1 < x_len {
+            if !rows_equal(table, x - offset, x + 1 + offset) {
+                mirror = false;
             }
+            offset += 1;
+        }
 
-            if mirror {
-                println!("Mirrored at rows {} and {}", row, row + 1);
-            }
+        if mirror && ignore_x.is_some() && ignore_x.unwrap() == *x {
+            mirror = false;
+        }
 
-            mirror
-        })
-    {
-        return (row + 1) * 100;
+        mirror
+    }) {
+        return Some((Some(x), None, (x + 1) * 100));
     }
 
-    panic!("Did not find mirrored col or row");
+    None
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    parse_input(input).iter().enumerate().map(solve).sum()
+    parse_input(input)
+        .iter()
+        .map(|table| solve(table, None, None).unwrap().2)
+        .sum()
 }
 
-pub fn solve_part_2(_input: &str) -> usize {
-    0
+pub fn solve_part_2(input: &str) -> usize {
+    parse_input(input)
+        .iter()
+        .map(|table| (table, solve(&table, None, None).unwrap()))
+        .map(|(table, (result_x, result_y, result))| {
+            for x in 0..table.len() {
+                for y in 0..table[0].len() {
+                    let mut new_table = table.clone();
+                    if new_table[x][y] == '.' {
+                        new_table[x][y] = '#';
+                    } else {
+                        new_table[x][y] = '.';
+                    }
+                    if let Some((_, _, new_result)) = solve(&new_table, result_x, result_y) {
+                        if new_result == result {
+                            panic!("Results should have been different");
+                        }
+                        return new_result;
+                    }
+                }
+            }
+
+            panic!("Should have found a new result");
+        })
+        .sum()
 }
 
 #[cfg(test)]
@@ -115,7 +117,6 @@ mod tests {
 
     #[test]
     fn part1_real_input() {
-        // 21789 is too low
         assert_eq!(super::solve_part_1(&include_str!("day13/input")), 30_575);
     }
 
@@ -126,6 +127,6 @@ mod tests {
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("day13/input")), 34_655_848);
+        assert_eq!(super::solve_part_2(&include_str!("day13/input")), 37_478);
     }
 }
