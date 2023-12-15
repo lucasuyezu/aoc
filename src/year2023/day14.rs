@@ -1,4 +1,4 @@
-use crate::utils::calculate_hash;
+use crate::utils::{calculate_hash, rotate};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -37,72 +37,16 @@ fn tilt_north(mut grid: Grid) -> Option<Grid> {
     Some(grid)
 }
 
-fn tilt_west(mut grid: Grid) -> Option<Grid> {
-    let x_len = grid.len();
-    let y_len = grid[0].len();
-
-    for x in 0..x_len {
-        for y in 0..y_len {
-            if grid[x][y] == ROUNDED_ROCK {
-                let mut yy = y;
-                while yy > 0 && grid[x][yy - 1] == EMPTY_SPACE {
-                    grid[x][yy - 1] = ROUNDED_ROCK;
-                    grid[x][yy] = EMPTY_SPACE;
-                    yy -= 1;
-                }
-            }
-        }
-    }
-
-    Some(grid)
-}
-
-fn tilt_south(mut grid: Grid) -> Option<Grid> {
-    let x_len = grid.len();
-    let y_len = grid[0].len();
-
-    for y in 0..y_len {
-        for x in (0..x_len).rev() {
-            if grid[x][y] == ROUNDED_ROCK {
-                let mut xx = x;
-                while xx < x_len - 1 && grid[xx + 1][y] == EMPTY_SPACE {
-                    grid[xx + 1][y] = ROUNDED_ROCK;
-                    grid[xx][y] = EMPTY_SPACE;
-                    xx += 1;
-                }
-            }
-        }
-    }
-
-    Some(grid)
-}
-
-fn tilt_east(mut grid: Grid) -> Option<Grid> {
-    let x_len = grid.len();
-    let y_len = grid[0].len();
-
-    for x in 0..x_len {
-        for y in (0..y_len).rev() {
-            if grid[x][y] == ROUNDED_ROCK {
-                let mut yy = y;
-                while yy < y_len - 1 && grid[x][yy + 1] == EMPTY_SPACE {
-                    grid[x][yy + 1] = ROUNDED_ROCK;
-                    grid[x][yy] = EMPTY_SPACE;
-                    yy += 1;
-                }
-            }
-        }
-    }
-
-    Some(grid)
-}
-
 fn cycle(grid: Grid) -> Option<Grid> {
     Some(grid)
         .and_then(tilt_north)
-        .and_then(tilt_west)
-        .and_then(tilt_south)
-        .and_then(tilt_east)
+        .and_then(rotate)
+        .and_then(tilt_north)
+        .and_then(rotate)
+        .and_then(tilt_north)
+        .and_then(rotate)
+        .and_then(tilt_north)
+        .and_then(rotate)
 }
 
 fn find_cycle(mut grid: Grid) -> Option<Grid> {
