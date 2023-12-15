@@ -33,6 +33,7 @@ pub fn lcm(arr: &[usize]) -> usize {
     arr.iter().fold(arr[0], |acc, num| (acc * num) / (gcd(*num, acc)))
 }
 
+#[allow(dead_code)]
 pub fn print_2d_vec(vec: &Vec<Vec<char>>) {
     let mut output = String::with_capacity(vec.len() * vec[0].len() + vec.len());
     for x in 0..vec.len() {
@@ -83,6 +84,7 @@ pub fn rotate(v: Vec<Vec<char>>) -> Option<Vec<Vec<char>>> {
 // c,f (0,0), (0,1)
 // b,e (1,0), (1,1)
 // a,d (2,0), (2,1)
+#[allow(dead_code)]
 pub fn rotate_left(v: Vec<Vec<char>>) -> Option<Vec<Vec<char>>> {
     let x_len = v.len();
     let y_len = v[0].len();
