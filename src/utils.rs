@@ -4,6 +4,8 @@ pub mod snafu;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use self::point::Point;
+
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseInputError;
 
@@ -121,4 +123,27 @@ mod tests {
             Some(vec![vec!['c', 'f'], vec!['b', 'e'], vec!['a', 'd']])
         );
     }
+}
+
+pub struct Grid {
+    pub data: Vec<Vec<char>>,
+    pub x_len: usize,
+    pub y_len: usize,
+}
+impl Grid {
+    pub fn is_inside(&self, point: &Point) -> bool {
+        point.x >= 0 && (point.x as usize) < self.x_len && point.y >= 0 && (point.y as usize) < self.y_len
+    }
+}
+
+pub fn parse_input_into_grid(input: &str) -> Grid {
+    let data = input
+        .lines()
+        .map(|line| line.chars().collect::<Vec<_>>())
+        .collect::<Vec<Vec<_>>>();
+
+    let x_len = data.len();
+    let y_len = data[0].len();
+
+    Grid { data, x_len, y_len }
 }
