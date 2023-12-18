@@ -1,5 +1,6 @@
 pub mod geometry;
 pub mod point;
+pub mod point_v2;
 pub mod snafu;
 
 use std::collections::hash_map::DefaultHasher;
