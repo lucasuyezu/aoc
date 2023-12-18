@@ -125,22 +125,23 @@ mod tests {
     }
 }
 
-pub struct Grid {
-    pub data: Vec<Vec<char>>,
+#[derive(Debug)]
+pub struct Grid<T> {
+    pub data: Vec<Vec<T>>,
     pub x_len: usize,
     pub y_len: usize,
 }
-impl Grid {
+impl<T> Grid<T> {
     pub fn is_inside(&self, point: &Point) -> bool {
         point.x >= 0 && (point.x as usize) < self.x_len && point.y >= 0 && (point.y as usize) < self.y_len
     }
 }
 
-pub fn parse_input_into_grid(input: &str) -> Grid {
+pub fn parse_input_into_char_grid(input: &str) -> Grid<char> {
     let data = input
         .lines()
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<Vec<_>>>();
+        .map(|line| line.chars().collect::<Vec<char>>())
+        .collect::<Vec<Vec<char>>>();
 
     let x_len = data.len();
     let y_len = data[0].len();

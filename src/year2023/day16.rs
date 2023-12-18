@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use rayon::prelude::*;
 
 use crate::utils::{
-    parse_input_into_grid,
+    parse_input_into_char_grid,
     point::{Point, EAST, NORTH, SOUTH, WEST},
     Grid,
 };
@@ -58,7 +58,7 @@ fn new_direction(direction: Point, tile: char) -> Point {
     }
 }
 
-fn energize(grid: &Grid, start: Point, direction: Point) -> usize {
+fn energize(grid: &Grid<char>, start: Point, direction: Point) -> usize {
     let mut energized_tiles: HashSet<Point> = HashSet::new();
     let mut splitter_cache: HashSet<Point> = HashSet::new();
     let mut beams = vec![Beam {
@@ -116,12 +116,12 @@ fn energize(grid: &Grid, start: Point, direction: Point) -> usize {
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    let grid = parse_input_into_grid(input);
+    let grid = parse_input_into_char_grid(input);
     energize(&grid, Point { x: 0, y: 0 }, EAST)
 }
 
 pub fn solve_part_2(input: &str) -> usize {
-    let grid = parse_input_into_grid(input);
+    let grid = parse_input_into_char_grid(input);
 
     let mut grid_starting_positions = vec![];
 
