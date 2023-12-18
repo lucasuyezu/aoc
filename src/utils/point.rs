@@ -6,6 +6,7 @@ pub const SOUTH: Point = Point { x: 1, y: 0 };
 pub const SW: Point = Point { x: 1, y: -1 };
 pub const WEST: Point = Point { x: 0, y: -1 };
 pub const NW: Point = Point { x: -1, y: -1 };
+pub const ORIGIN: Point = Point { x: 0, y: 0 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Copy)]
 pub struct Point {

@@ -1,8 +1,10 @@
 use super::point::Point;
 
+#[allow(dead_code)]
 pub struct Polygon {
     vertices: Vec<Point>,
 }
+#[allow(dead_code)]
 impl Polygon {
     /*
     Got this from https://en.wikipedia.org/wiki/Shoelace_formula

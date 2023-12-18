@@ -9,6 +9,7 @@ use crate::utils::{
 struct DigPlan {
     direction: Point,
     count: usize,
+    #[allow(dead_code)]
     hex: String,
 }
 
