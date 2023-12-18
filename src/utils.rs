@@ -148,3 +148,19 @@ pub fn parse_input_into_char_grid(input: &str) -> Grid<char> {
 
     Grid { data, x_len, y_len }
 }
+
+pub fn parse_input_into_usize_grid(input: &str) -> Grid<usize> {
+    let data = input
+        .lines()
+        .map(|line| {
+            line.chars()
+                .map(|c| c.to_digit(10).unwrap() as usize)
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<Vec<_>>>();
+
+    let x_len = data.len();
+    let y_len = data[0].len();
+
+    Grid { data, x_len, y_len }
+}

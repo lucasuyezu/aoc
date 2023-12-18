@@ -23,6 +23,17 @@ impl std::ops::Add for Point {
     }
 }
 
+impl std::ops::Sub for Point {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            x: rhs.x - self.x,
+            y: rhs.y - self.y,
+        }
+    }
+}
+
 impl Point {
     pub fn manhattan_distance(&self, other_point: &Point) -> usize {
         (self.x - other_point.x).abs() as usize + (self.y - other_point.y).abs() as usize
