@@ -13,6 +13,15 @@ pub struct Point {
     pub y: isize,
 }
 
+impl Point {
+    pub fn origin() -> Point {
+        Point {
+            x: 0 as isize,
+            y: 0 as isize,
+        }
+    }
+}
+
 impl std::ops::Add for Point {
     type Output = Self;
     fn add(self, other: Self) -> Self {
