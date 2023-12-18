@@ -1,9 +1,9 @@
 pub fn solve_part_1(input: &str) -> usize {
-    0
+    todo!()
 }
 
 pub fn solve_part_2(_: &str) -> usize {
-    0
+    todo!()
 }
 
 #[cfg(test)]
