@@ -1,3 +1,4 @@
+pub mod geometry;
 pub mod point;
 pub mod snafu;
 
