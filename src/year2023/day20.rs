@@ -2,15 +2,17 @@ use std::collections::{HashMap, VecDeque};
 
 use crate::utils::lcm;
 
-type ModuleConfiguration = HashMap<String, (String, Vec<String>)>;
-type StateMap = HashMap<String, bool>;
-type ConjunctionStateMap = HashMap<String, StateMap>;
-
 const FLIP_FLOP: &'static str = "%";
 const CONJUNCTION: &'static str = "&";
 
-fn parse_input(input: &str) -> (ModuleConfiguration, StateMap, ConjunctionStateMap) {
-    let module_configuration: ModuleConfiguration = input
+fn parse_input(
+    input: &str,
+) -> (
+    HashMap<&str, (&str, Vec<&str>)>,
+    HashMap<&str, bool>,
+    HashMap<&str, HashMap<&str, bool>>,
+) {
+    let module_configuration: HashMap<&str, (&str, Vec<&str>)> = input
         .lines()
         .map(|line| {
             let (module_name_str, dest_str) = line.split_once("->").map(|(s1, s2)| (s1.trim(), s2.trim())).unwrap();
@@ -27,30 +29,27 @@ fn parse_input(input: &str) -> (ModuleConfiguration, StateMap, ConjunctionStateM
             };
 
             (
-                module_name.trim().to_string(),
+                module_name.trim(),
                 (
-                    module_kind.trim().to_string(),
-                    dest_str.trim().split(",").map(|s| s.trim().to_string()).collect(),
+                    module_kind.trim(),
+                    dest_str.trim().split(",").map(|s| s.trim()).collect(),
                 ),
             )
         })
         .collect();
 
-    let mut conjunction_states: HashMap<String, StateMap> = HashMap::new();
+    let mut conjunction_states: HashMap<&str, HashMap<&str, bool>> = HashMap::new();
 
     for (name, (kind, _)) in module_configuration.iter() {
-        if kind == CONJUNCTION {
-            conjunction_states.insert(name.clone(), HashMap::new());
+        if *kind == CONJUNCTION {
+            conjunction_states.insert(name, HashMap::new());
         }
     }
 
     for name in conjunction_states.clone().keys() {
         for (from_name, (_, destinations)) in module_configuration.iter() {
             if destinations.contains(name) {
-                conjunction_states
-                    .get_mut(name)
-                    .unwrap()
-                    .insert(from_name.clone(), false);
+                conjunction_states.get_mut(name).unwrap().insert(from_name, false);
             }
         }
     }
@@ -58,54 +57,54 @@ fn parse_input(input: &str) -> (ModuleConfiguration, StateMap, ConjunctionStateM
     (module_configuration, HashMap::new(), conjunction_states)
 }
 
-fn press_button(
-    configuration: &ModuleConfiguration,
-    flip_flop_states: &mut StateMap,
-    conjunction_states: &mut HashMap<String, StateMap>,
-) -> HashMap<(String, String), (usize, usize)> {
-    let mut pulses: HashMap<(String, String), (usize, usize)> = HashMap::new();
-    pulses.insert(("input".to_string(), "broadcaster".to_string()), (1, 0));
+fn press_button<'a>(
+    configuration: &HashMap<&str, (&str, Vec<&'a str>)>,
+    flip_flop_states: &mut HashMap<&'a str, bool>,
+    conjunction_states: &mut HashMap<&str, HashMap<&'a str, bool>>,
+) -> HashMap<(&'a str, &'a str), (usize, usize)> {
+    let mut pulses: HashMap<(&str, &str), (usize, usize)> = HashMap::new();
+    pulses.insert(("input", "broadcaster"), (1, 0));
 
     let (_kind, destinations) = configuration.get("broadcaster").unwrap();
-    let mut queue: VecDeque<(String, String, bool)> = VecDeque::new();
+    let mut queue: VecDeque<(&str, &str, bool)> = VecDeque::new();
 
     for destination in destinations {
-        queue.push_back((destination.clone(), "broadcaster".to_string(), false));
+        queue.push_back((destination, "broadcaster", false));
     }
 
     while let Some((module_name, module_from, high_pulse)) = queue.pop_front() {
         if high_pulse {
             pulses
-                .entry((module_from.to_string(), module_name.clone()))
+                .entry((module_from, module_name))
                 .and_modify(|(_, high)| *high += 1)
                 .or_insert((0, 1));
         } else {
             pulses
-                .entry((module_from.to_string(), module_name.clone()))
+                .entry((module_from, module_name))
                 .and_modify(|(low, _)| *low += 1)
                 .or_insert((1, 0));
         }
 
-        if let Some((kind, destinations)) = configuration.get(&module_name) {
+        if let Some((kind, destinations)) = configuration.get(module_name) {
             let low_pulse = !high_pulse;
 
-            if kind == FLIP_FLOP && low_pulse {
-                let state = *flip_flop_states.get(&module_name).unwrap_or(&false);
-                flip_flop_states.insert(module_name.clone(), !state);
+            if *kind == FLIP_FLOP && low_pulse {
+                let state = *flip_flop_states.get(module_name).unwrap_or(&false);
+                flip_flop_states.insert(module_name, !state);
 
                 for destination in destinations {
-                    queue.push_back((destination.clone(), module_name.clone(), !state));
+                    queue.push_back((destination, module_name, !state));
                 }
             }
 
-            if kind == CONJUNCTION {
-                let x = conjunction_states.get_mut(&module_name).unwrap();
-                x.insert(module_from.clone(), high_pulse);
+            if *kind == CONJUNCTION {
+                let x = conjunction_states.get_mut(module_name).unwrap();
+                x.insert(module_from, high_pulse);
 
                 let all_high_pulses = x.values().all(|state| *state);
 
                 for destination in destinations {
-                    queue.push_back((destination.clone(), module_name.clone(), !all_high_pulses));
+                    queue.push_back((destination, module_name, !all_high_pulses));
                 }
             }
         }
@@ -117,19 +116,17 @@ fn press_button(
 pub fn solve_part_1(input: &str) -> usize {
     let (module_configuration, mut flip_flop_states, mut conjunction_states) = parse_input(input);
 
-    let (total_low, total_high) = (0..1_000)
-        .map(|_| {
-            press_button(&module_configuration, &mut flip_flop_states, &mut conjunction_states)
-                .values()
-                .fold((0, 0), |(total_low, total_high), (cur_low, cur_high)| {
-                    (total_low + cur_low, total_high + cur_high)
-                })
-        })
-        .fold((0, 0), |(total_low, total_high), (cur_low, cur_high)| {
-            (total_low + cur_low, total_high + cur_high)
-        });
+    let mut total_lo = 0;
+    let mut total_hi = 0;
 
-    total_low * total_high
+    for _ in 0..1_000 {
+        for (lo, hi) in press_button(&module_configuration, &mut flip_flop_states, &mut conjunction_states).values() {
+            total_lo += *lo;
+            total_hi += *hi;
+        }
+    }
+
+    total_lo * total_hi
 }
 
 pub fn solve_part_2(input: &str) -> usize {
@@ -143,11 +140,11 @@ pub fn solve_part_2(input: &str) -> usize {
     //     "qk": false,
     //     "kr": false,
     // },
-    let mut cycle_modules: HashMap<String, usize> = conjunction_states
+    let mut cycle_modules: HashMap<&str, usize> = conjunction_states
         .get("gf")
         .unwrap()
         .iter()
-        .map(|(name, _)| (name.clone(), 0))
+        .map(|(name, _)| (*name, 0))
         .collect();
 
     for i in 1..usize::MAX {
@@ -155,9 +152,9 @@ pub fn solve_part_2(input: &str) -> usize {
 
         pulses
             .iter()
-            .filter(|((_, module_to), (_, high))| module_to == "gf" && *high > 0)
+            .filter(|((_, module_to), (_, high))| *module_to == "gf" && *high > 0)
             .for_each(|((module_from, _), _)| {
-                cycle_modules.entry(module_from.clone()).and_modify(|e| {
+                cycle_modules.entry(module_from).and_modify(|e| {
                     if *e == 0 {
                         *e = i
                     }
