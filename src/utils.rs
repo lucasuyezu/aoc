@@ -128,14 +128,37 @@ mod tests {
 }
 
 #[derive(Debug)]
-pub struct Grid<T> {
+pub struct Grid<T: Copy> {
     pub data: Vec<Vec<T>>,
     pub x_len: usize,
     pub y_len: usize,
 }
-impl<T> Grid<T> {
+impl<T: Copy + PartialEq> Grid<T> {
     pub fn is_inside(&self, point: &Point) -> bool {
         point.x >= 0 && (point.x as usize) < self.x_len && point.y >= 0 && (point.y as usize) < self.y_len
+    }
+
+    pub fn get_value(&self, point: &Point) -> Option<T> {
+        if self.is_inside(point) {
+            return Some(self.data[point.x as usize][point.y as usize]);
+        }
+
+        None
+    }
+
+    pub fn get_pos(&self, val: &T) -> Option<Point> {
+        for x in 0..self.x_len {
+            for y in 0..self.y_len {
+                if self.data[x][y] == *val {
+                    return Some(Point {
+                        x: x as isize,
+                        y: y as isize,
+                    });
+                }
+            }
+        }
+
+        None
     }
 }
 
