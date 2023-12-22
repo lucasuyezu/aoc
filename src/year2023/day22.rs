@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
@@ -34,16 +35,6 @@ impl Brick {
             .iter()
             .any(|cube| other.cubes.iter().any(|other_cube| cube.is_on_top_of(other_cube)))
     }
-
-    // fn is_at_rest(&self, bricks: &[Brick]) -> bool {
-    //     // I'm at rest if I'm touching the ground or
-    //     // if I'm standing on top of any brick at rest
-    //     self.is_on_ground()
-    //         || bricks
-    //             .iter()
-    //             .filter(|brick| *brick != self)
-    //             .any(|brick| self.is_on_top_of(brick) && brick.is_at_rest(bricks))
-    // }
 }
 
 fn parse_input(input: &str) -> (Vec<Brick>, Vec<Vec<Vec<Option<usize>>>>) {
@@ -127,91 +118,109 @@ fn parse_input(input: &str) -> (Vec<Brick>, Vec<Vec<Vec<Option<usize>>>>) {
     (bricks, grid)
 }
 
-pub fn solve_part_1(input: &str) -> usize {
+pub fn simulate(input: &str) -> (HashMap<usize, HashSet<usize>>, HashSet<usize>) {
     let (mut bricks, mut grid) = parse_input(input);
 
-    dbg!(&bricks);
-    dbg!(&grid);
-
     for brick in bricks.iter_mut() {
-        // dbg!(&brick);
-
         let mut is_at_rest = false;
 
         while !is_at_rest {
             if brick.is_on_ground() {
-                println!("Brick {} is on the ground. Moving on...", brick.id);
                 is_at_rest = true;
                 continue;
             }
 
-            // if any of my cubes are touching someone at z-1 *that is not me*, stop
-            if let Some(cube) = brick.cubes.iter().find(|cube| {
+            if brick.cubes.iter().any(|cube| {
                 let cube_below = grid[cube.x][cube.y][cube.z - 1];
-                // dbg!(cube);
-                // dbg!(cube_below);
                 cube_below.is_some() && cube_below.unwrap() != brick.id
             }) {
-                println!(
-                    "Brick {} is touching brick {}. Moving on...",
-                    brick.id,
-                    grid[cube.x][cube.y][cube.z - 1].unwrap()
-                );
                 is_at_rest = true;
                 continue;
             }
 
-            println!("Brick {} is going down one level.", brick.id);
-            // All of my cubes can go down by 1
             for cube in brick.cubes.iter_mut() {
                 grid[cube.x][cube.y][cube.z] = None;
                 grid[cube.x][cube.y][cube.z - 1] = Some(brick.id);
                 cube.z -= 1;
             }
-            // println!("Brick is now {:?}", brick);
         }
     }
 
     // All bricks are at rest now
-    dbg!(&bricks);
-    // dbg!(&bricks.iter().filter(|cube| cube.is_at_rest(&bricks)).collect_vec());
 
-    let mut x: HashMap<usize, Vec<usize>> = HashMap::new();
+    let mut dependency_map: HashMap<usize, HashSet<usize>> = HashMap::new();
     let mut safe_for_disintegration: HashSet<usize> = HashSet::new();
 
     for brick in bricks.iter() {
-        x.insert(brick.id, vec![]);
+        dependency_map.insert(brick.id, HashSet::new());
         safe_for_disintegration.insert(brick.id);
     }
 
     for outer_brick in bricks.iter() {
         for inner_brick in bricks.iter() {
             if outer_brick != inner_brick && inner_brick.is_on_top_of(&outer_brick) {
-                x.entry(inner_brick.id).and_modify(|v| v.push(outer_brick.id));
-                println!(
-                    "Brick {:?} is being supporting by brick {:?}",
-                    inner_brick.id, outer_brick.id
-                );
+                dependency_map.entry(inner_brick.id).and_modify(|v| {
+                    v.insert(outer_brick.id);
+                });
             }
         }
     }
 
-    dbg!(&x);
-
-    for v in x.values() {
+    for v in dependency_map.values() {
         if v.len() == 1 {
-            println!("Brick {} isn't safe for disintegration", v[0]);
-            safe_for_disintegration.remove(&v[0]);
+            safe_for_disintegration.remove(&v.iter().next().unwrap());
         }
     }
 
-    dbg!(&safe_for_disintegration);
-
-    safe_for_disintegration.len()
+    (dependency_map, safe_for_disintegration)
 }
 
-pub fn solve_part_2(_: &str) -> usize {
-    todo!()
+pub fn solve_part_1(input: &str) -> usize {
+    simulate(input).1.len()
+}
+
+pub fn solve_part_2(input: &str) -> usize {
+    let dependency_map = simulate(input).0;
+
+    dependency_map
+        .par_iter()
+        .map(|(brick_id, _v)| {
+            let mut bricks_dropped: HashSet<usize> = HashSet::new();
+            bricks_dropped.insert(*brick_id);
+
+            let mut x = dependency_map.clone();
+
+            let mut stop = false;
+            while !stop {
+                let keys_empty_before: HashSet<usize> =
+                    x.iter().filter(|(_, v)| v.is_empty()).map(|(k, _)| k.clone()).collect();
+
+                for brick_dropped in bricks_dropped.iter() {
+                    for v in x.values_mut() {
+                        v.remove(&brick_dropped);
+                    }
+                }
+
+                let keys_empty_after: HashSet<usize> =
+                    x.iter().filter(|(_, v)| v.is_empty()).map(|(k, _)| k.clone()).collect();
+
+                let keys_removed: HashSet<&usize> = keys_empty_after
+                    .iter()
+                    .filter(|key| !keys_empty_before.contains(key))
+                    .collect();
+
+                if keys_removed.is_empty() {
+                    stop = true;
+                }
+
+                for k in keys_removed {
+                    bricks_dropped.insert(*k);
+                }
+            }
+
+            bricks_dropped.len() - 1
+        })
+        .sum()
 }
 
 #[cfg(test)]
@@ -228,11 +237,12 @@ mod tests {
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2(&include_str!("day22/test_input")), 1);
+        assert_eq!(super::solve_part_2(&include_str!("day22/test_input")), 7);
     }
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("day22/input")), 1);
+        // This takes 11s to run in --release mode, doesn't finish in test mode.
+        assert_eq!(super::solve_part_2(&include_str!("day22/input")), 79_465);
     }
 }
