@@ -1,9 +1,8 @@
 use std::collections::{HashMap, VecDeque};
 
 use crate::utils::{
-    parse_input_into_usize_grid,
+    grid::Grid,
     point::{Point, EAST, NORTH, ORIGIN, SOUTH, WEST},
-    Grid,
 };
 
 type Node = (Point, Point, usize);
@@ -141,7 +140,7 @@ fn neighbours(
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    let grid = parse_input_into_usize_grid(input);
+    let grid: Grid<usize> = input.parse().unwrap();
     let start = Point::origin();
     let end = Point {
         x: grid.x_len as isize - 1,
@@ -152,7 +151,7 @@ pub fn solve_part_1(input: &str) -> usize {
 }
 
 pub fn solve_part_2(input: &str) -> usize {
-    let grid = parse_input_into_usize_grid(input);
+    let grid: Grid<usize> = input.parse().unwrap();
     let start = Point::origin();
     let end = Point {
         x: grid.x_len as isize - 1,

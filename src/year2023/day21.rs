@@ -1,16 +1,15 @@
 use std::collections::{HashSet, VecDeque};
 
 use crate::utils::{
-    parse_input_into_char_grid,
+    grid::Grid,
     point::{Point, EAST, NORTH, SOUTH, WEST},
-    Grid,
 };
 
 const START: char = 'S';
 const GARDEN_PLOT: char = '.';
 // const ROCK: char = '#';
 
-fn walk(grid: &Grid<char>, max_steps: usize, infinity: bool) -> usize {
+fn walk(grid: &Grid<char>, max_steps: usize, _infinity: bool) -> usize {
     // dbg!(&max_steps);
     let mut results: HashSet<Point> = HashSet::new();
     let mut visited: HashSet<(Point, usize)> = HashSet::new();
@@ -53,23 +52,23 @@ fn walk(grid: &Grid<char>, max_steps: usize, infinity: bool) -> usize {
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    let grid = parse_input_into_char_grid(input);
+    let grid: Grid<char> = input.parse().unwrap();
     walk(&grid, 64, false)
 }
 
 pub fn solve_part_2(input: &str) -> usize {
-    let grid = parse_input_into_char_grid(input);
+    let grid: Grid<char> = input.parse().unwrap();
     walk(&grid, 64, true)
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::parse_input_into_char_grid;
+    use crate::utils::grid::Grid;
 
     #[test]
     fn part1_test_input() {
         let input = &include_str!("day21/test_input");
-        let grid = parse_input_into_char_grid(input);
+        let grid: Grid<char> = input.parse().unwrap();
 
         for (steps, result) in vec![(1, 2), (2, 4), (3, 6), (6, 16)] {
             assert_eq!(super::walk(&grid, steps, false), result);
@@ -84,7 +83,7 @@ mod tests {
     #[test]
     fn part2_test_input() {
         let input = &include_str!("day21/test_input");
-        let grid = parse_input_into_char_grid(input);
+        let grid: Grid<char> = input.parse().unwrap();
 
         for (steps, result) in vec![
             (6, 16),

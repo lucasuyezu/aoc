@@ -1,12 +1,11 @@
 pub mod geometry;
+pub mod grid;
 pub mod point;
 pub mod point_v2;
 pub mod snafu;
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-
-use self::point::Point;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseInputError;
@@ -125,67 +124,4 @@ mod tests {
             Some(vec![vec!['c', 'f'], vec!['b', 'e'], vec!['a', 'd']])
         );
     }
-}
-
-#[derive(Debug)]
-pub struct Grid<T: Copy> {
-    pub data: Vec<Vec<T>>,
-    pub x_len: usize,
-    pub y_len: usize,
-}
-impl<T: Copy + PartialEq> Grid<T> {
-    pub fn is_inside(&self, point: &Point) -> bool {
-        point.x >= 0 && (point.x as usize) < self.x_len && point.y >= 0 && (point.y as usize) < self.y_len
-    }
-
-    pub fn get_value(&self, point: &Point) -> Option<T> {
-        if self.is_inside(point) {
-            return Some(self.data[point.x as usize][point.y as usize]);
-        }
-
-        None
-    }
-
-    pub fn get_pos(&self, val: &T) -> Option<Point> {
-        for x in 0..self.x_len {
-            for y in 0..self.y_len {
-                if self.data[x][y] == *val {
-                    return Some(Point {
-                        x: x as isize,
-                        y: y as isize,
-                    });
-                }
-            }
-        }
-
-        None
-    }
-}
-
-pub fn parse_input_into_char_grid(input: &str) -> Grid<char> {
-    let data = input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<char>>())
-        .collect::<Vec<Vec<char>>>();
-
-    let x_len = data.len();
-    let y_len = data[0].len();
-
-    Grid { data, x_len, y_len }
-}
-
-pub fn parse_input_into_usize_grid(input: &str) -> Grid<usize> {
-    let data = input
-        .lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| c.to_digit(10).unwrap() as usize)
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<Vec<_>>>();
-
-    let x_len = data.len();
-    let y_len = data[0].len();
-
-    Grid { data, x_len, y_len }
 }

@@ -3,9 +3,8 @@ use std::collections::HashSet;
 use rayon::prelude::*;
 
 use crate::utils::{
-    parse_input_into_char_grid,
+    grid::Grid,
     point::{Point, EAST, NORTH, SOUTH, WEST},
-    Grid,
 };
 
 #[derive(Debug)]
@@ -116,12 +115,12 @@ fn energize(grid: &Grid<char>, start: Point, direction: Point) -> usize {
 }
 
 pub fn solve_part_1(input: &str) -> usize {
-    let grid = parse_input_into_char_grid(input);
+    let grid: Grid<char> = input.parse().unwrap();
     energize(&grid, Point { x: 0, y: 0 }, EAST)
 }
 
 pub fn solve_part_2(input: &str) -> usize {
-    let grid = parse_input_into_char_grid(input);
+    let grid: Grid<char> = input.parse().unwrap();
 
     let mut grid_starting_positions = vec![];
 
