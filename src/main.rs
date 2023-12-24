@@ -56,7 +56,7 @@ macro_rules! solve_str {
 }
 
 fn duration_with_colour(duration: Duration) -> String {
-    let color = if duration.as_millis() < 1 {
+    let color = if duration.as_millis() < 10 {
         92
     } else if duration.as_secs() < 1 {
         93
