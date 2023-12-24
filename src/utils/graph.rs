@@ -14,6 +14,7 @@ struct Graph {
 }
 
 impl Graph {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
             nodes: HashSet::new(),
@@ -22,6 +23,7 @@ impl Graph {
         }
     }
 
+    #[allow(dead_code)]
     pub fn insert_edge(&mut self, from: String, to: String, distance: usize) {
         self.nodes.insert(from.clone());
         self.nodes.insert(to.clone());
@@ -52,6 +54,7 @@ impl Graph {
     //   41 |
     //      v
     //      H
+    #[allow(dead_code)]
     pub fn compact(&mut self) {
         let mut stop = false;
         while !stop {
