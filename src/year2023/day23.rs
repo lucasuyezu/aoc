@@ -1,5 +1,6 @@
-use std::collections::BinaryHeap;
+use std::collections::{HashSet, VecDeque};
 
+use crate::utils::graph::Graph;
 use crate::utils::{
     grid::Grid,
     point::{Point, EAST, NORTH, SOUTH, WEST},
@@ -12,102 +13,131 @@ const SLOPE_EAST: char = '>';
 const SLOPE_SOUTH: char = 'v';
 const SLOPE_WEST: char = '<';
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-struct Node {
-    position: Point,
-    direction: Point,
-    distance: usize,
-}
+fn longest_dijkstra(graph: &Graph, start: String, end: String) -> usize {
+    let mut result = usize::MIN;
+    let mut queue = VecDeque::new();
 
-impl PartialOrd for Node {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
+    queue.push_back((start, 0, HashSet::new()));
 
-impl Ord for Node {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.distance.cmp(&other.distance)
-    }
-}
+    let mut counter = 0;
 
-fn longest_dijkstra(grid: Grid<char>, start: Point, end: Point) -> usize {
-    let mut results = vec![];
-    let mut queue = BinaryHeap::new();
+    while let Some(cur_node) = queue.pop_front() {
+        counter += 1;
+        let (cur_pos, cur_dist, mut cur_visited) = cur_node.clone();
 
-    queue.push(Node {
-        position: start,
-        direction: start,
-        distance: 0,
-    });
+        if counter % 100_000 == 0 {
+            println!("{}", counter);
+        }
 
-    while let Some(current) = queue.pop() {
-        println!("Popped {:?}", current);
-
-        if current.position == end {
-            results.push(current.distance);
+        if cur_pos == end && cur_dist > result {
+            println!("Possible result: {}", cur_dist);
+            result = cur_dist;
             continue;
         }
 
-        for neighbour_direction in vec![EAST, SOUTH, WEST, NORTH] {
-            let forbidden_direction = match current.direction {
-                EAST => WEST,
-                SOUTH => NORTH,
-                WEST => EAST,
-                NORTH => SOUTH,
-                _ => panic!("Invalid direction"),
+        if cur_visited.contains(&cur_pos) {
+            continue;
+        }
+
+        cur_visited.insert(cur_pos.clone());
+
+        for (n_node, n_dist) in graph.neighbours(cur_pos) {
+            let neighbour_node = (n_node, cur_dist + n_dist, cur_visited.clone());
+            queue.push_back(neighbour_node);
+        }
+    }
+
+    result
+}
+
+fn parse_graph(grid: &Grid<char>, ignore_slopes: bool) -> Graph {
+    let mut graph = Graph::new();
+
+    for (x, row) in grid.data.iter().enumerate() {
+        for (y, value) in row.iter().enumerate() {
+            let pos = Point {
+                x: x as isize,
+                y: y as isize,
             };
 
-            if neighbour_direction == forbidden_direction {
+            if *value == FOREST {
                 continue;
             }
 
-            let neighbour_position = current.position + neighbour_direction;
+            println!("In {:?}", pos);
+            for n_dir in neighbours(value, ignore_slopes) {
+                let n_pos = pos + n_dir;
+                match grid.get_value(&n_pos) {
+                    None => {}
+                    Some(n_value) => {
+                        let forbidden_val = match n_dir {
+                            EAST => SLOPE_WEST,
+                            SOUTH => SLOPE_NORTH,
+                            WEST => SLOPE_EAST,
+                            NORTH => SLOPE_SOUTH,
+                            _ => panic!("Invalid direction"),
+                        };
 
-            if let Some(value) = grid.get_value(&neighbour_position) {
-                let forbidden_val = match neighbour_direction {
-                    EAST => SLOPE_WEST,
-                    SOUTH => SLOPE_NORTH,
-                    WEST => SLOPE_EAST,
-                    NORTH => SLOPE_SOUTH,
-                    _ => panic!("Invalid direction"),
-                };
-
-                if value == FOREST || value == forbidden_val {
-                    continue;
+                        if n_value != FOREST && (ignore_slopes || n_value != forbidden_val) {
+                            println!("\tAdding neighbour {:?}", n_pos);
+                            graph.insert_edge_directed(
+                                format!("{}-{}", pos.x, pos.y),
+                                format!("{}-{}", n_pos.x, n_pos.y),
+                                1,
+                            );
+                        }
+                    }
                 }
-
-                let neighbour_node = Node {
-                    position: neighbour_position,
-                    direction: neighbour_direction,
-                    distance: current.distance + 1,
-                };
-
-                println!("\tPushing {:?}", neighbour_node);
-                queue.push(neighbour_node);
             }
         }
     }
 
-    dbg!(&results);
-    *results.iter().max().unwrap()
+    graph
+}
+
+fn neighbours(value: &char, ignore_slopes: bool) -> Vec<Point> {
+    if ignore_slopes {
+        vec![EAST, SOUTH, WEST, NORTH]
+    } else {
+        match value {
+            &PATH => vec![EAST, SOUTH, WEST, NORTH],
+            &SLOPE_EAST => vec![EAST],
+            &SLOPE_SOUTH => vec![SOUTH],
+            &SLOPE_WEST => vec![WEST],
+            &SLOPE_NORTH => vec![NORTH],
+            _ => panic!(),
+        }
+    }
 }
 
 pub fn solve_part_1(input: &str) -> usize {
     let grid: Grid<char> = input.parse().unwrap();
-    dbg!(&grid);
-
     let start = grid.find_in_row(0, &PATH).unwrap();
-    dbg!(&start);
-
     let end = grid.find_in_row(grid.x_len - 1, &PATH).unwrap();
-    dbg!(&end);
 
-    longest_dijkstra(grid, start, end)
+    let mut graph = parse_graph(&grid, false);
+    graph.compact();
+
+    longest_dijkstra(
+        &graph,
+        format!("{}-{}", start.x, start.y),
+        format!("{}-{}", end.x, end.y),
+    )
 }
 
-pub fn solve_part_2(_: &str) -> usize {
-    todo!()
+pub fn solve_part_2(input: &str) -> usize {
+    let grid: Grid<char> = input.parse().unwrap();
+    let start = grid.find_in_row(0, &PATH).unwrap();
+    let end = grid.find_in_row(grid.x_len - 1, &PATH).unwrap();
+
+    let mut graph = parse_graph(&grid, true);
+    graph.compact();
+
+    longest_dijkstra(
+        &graph,
+        format!("{}-{}", start.x, start.y),
+        format!("{}-{}", end.x, end.y),
+    )
 }
 
 #[cfg(test)]
@@ -124,11 +154,11 @@ mod tests {
 
     #[test]
     fn part2_test_input() {
-        assert_eq!(super::solve_part_2(&include_str!("day23/test_input")), 1);
+        assert_eq!(super::solve_part_2(&include_str!("day23/test_input")), 154);
     }
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("day23/input")), 1);
+        assert_eq!(super::solve_part_2(&include_str!("day23/input")), 6_410);
     }
 }
