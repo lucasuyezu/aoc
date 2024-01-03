@@ -21,6 +21,16 @@ impl Point {
             y: 0 as isize,
         }
     }
+
+    pub fn from_direction(c: char) -> Self {
+        match c {
+            '>' => EAST,
+            'v' => SOUTH,
+            '<' => WEST,
+            '^' => NORTH,
+            x => panic!("Invalid char {}", x),
+        }
+    }
 }
 
 impl std::ops::Add for Point {

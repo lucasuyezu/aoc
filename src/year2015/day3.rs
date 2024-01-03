@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::utils::point::{Point, EAST, NORTH, SOUTH, WEST};
+use crate::utils::point::Point;
 
 pub fn solve_part_1(input: &str) -> usize {
     let mut houses: HashSet<Point> = HashSet::new();
@@ -9,15 +9,7 @@ pub fn solve_part_1(input: &str) -> usize {
     let mut current_point = Point::origin();
 
     for c in input.trim().chars() {
-        let direction = match c {
-            '>' => EAST,
-            'v' => SOUTH,
-            '<' => WEST,
-            '^' => NORTH,
-            x => panic!("Invalid char {}", x),
-        };
-
-        current_point = current_point + direction;
+        current_point = current_point + Point::from_direction(c);
         houses.insert(current_point);
     }
 
@@ -34,13 +26,7 @@ pub fn solve_part_2(input: &str) -> usize {
     let mut santa_moves = true;
 
     for c in input.trim().chars() {
-        let direction = match c {
-            '>' => EAST,
-            'v' => SOUTH,
-            '<' => WEST,
-            '^' => NORTH,
-            x => panic!("Invalid char {}", x),
-        };
+        let direction = Point::from_direction(c);
 
         if santa_moves {
             santa_position = santa_position + direction;
