@@ -3,65 +3,87 @@ use std::collections::{HashMap, HashSet};
 use regex::Regex;
 
 lazy_static! {
-    static ref VAL_RE: Regex = Regex::new(r"\A(\d+)\z").unwrap();
-    static ref AND_RE: Regex = Regex::new(r"\A(\w+) AND (\w+)\z").unwrap();
-    static ref OR_RE: Regex = Regex::new(r"\A(\w+) OR (\w+)\z").unwrap();
+    static ref VAL_RE: Regex = Regex::new(r"\A(\d+) ->").unwrap();
+    static ref AND_RE: Regex = Regex::new(r"\A(\w+) AND (\w+) ->").unwrap();
+    static ref OR_RE: Regex = Regex::new(r"\A(\w+) OR (\w+) ->").unwrap();
     static ref LSHIFT_RE: Regex = Regex::new(r"\A(\w+) LSHIFT (\d+)").unwrap();
     static ref RSHIFT_RE: Regex = Regex::new(r"\A(\w+) RSHIFT (\d+)").unwrap();
-    static ref NOT_RE: Regex = Regex::new(r"\ANOT (\w+)\z").unwrap();
-    static ref WRITE_RE: Regex = Regex::new(r"\A([a-zA-Z]+)\z").unwrap();
+    static ref NOT_RE: Regex = Regex::new(r"\ANOT (\w+) ->").unwrap();
+    static ref WRITE_RE: Regex = Regex::new(r"\A([a-zA-Z]+) ->").unwrap();
 }
 
-fn deps(line: &str) -> HashSet<String> {
-    let mut result = HashSet::new();
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+enum Operation {
+    Value(usize),
+    And(String, String),
+    Or(String, String),
+    LShift(String, usize),
+    RShift(String, usize),
+    Not(String),
+    Write(String),
+}
 
-    if let Some(captures) = AND_RE.captures(line) {
+fn parse(line: &str) -> (Operation, String, HashSet<String>) {
+    let operation;
+    let mut deps = HashSet::new();
+
+    if let Some(captures) = VAL_RE.captures(line) {
+        operation = Operation::Value(captures[1].parse().unwrap());
+
         if captures[1].parse::<usize>().is_err() {
-            result.insert(captures[1].to_string());
+            deps.insert(captures[1].to_string());
         }
+    } else if let Some(captures) = AND_RE.captures(line) {
+        operation = Operation::And(captures[1].to_string(), captures[2].to_string());
 
+        if captures[1].parse::<usize>().is_err() {
+            deps.insert(captures[1].to_string());
+        }
         if captures[2].parse::<usize>().is_err() {
-            result.insert(captures[2].to_string());
+            deps.insert(captures[2].to_string());
         }
     } else if let Some(captures) = OR_RE.captures(line) {
-        if captures[1].parse::<usize>().is_err() {
-            result.insert(captures[1].to_string());
-        }
+        operation = Operation::Or(captures[1].to_string(), captures[2].to_string());
 
+        if captures[1].parse::<usize>().is_err() {
+            deps.insert(captures[1].to_string());
+        }
         if captures[2].parse::<usize>().is_err() {
-            result.insert(captures[2].to_string());
+            deps.insert(captures[2].to_string());
         }
     } else if let Some(captures) = LSHIFT_RE.captures(line) {
-        result.insert(captures[1].to_string());
+        operation = Operation::LShift(captures[1].to_string(), captures[2].parse().unwrap());
+        deps.insert(captures[1].to_string());
     } else if let Some(captures) = RSHIFT_RE.captures(line) {
-        result.insert(captures[1].to_string());
+        operation = Operation::RShift(captures[1].to_string(), captures[2].parse().unwrap());
+        deps.insert(captures[1].to_string());
     } else if let Some(captures) = NOT_RE.captures(line) {
-        result.insert(captures[1].to_string());
+        operation = Operation::Not(captures[1].to_string());
+        deps.insert(captures[1].to_string());
     } else if let Some(captures) = WRITE_RE.captures(line) {
-        result.insert(captures[1].to_string());
+        operation = Operation::Write(captures[1].to_string());
+        deps.insert(captures[1].to_string());
+    } else {
+        dbg!(&line);
+        panic!();
     }
 
-    result
+    (operation, line.split_once("->").unwrap().1.trim().to_string(), deps)
 }
 
 pub fn solve(input: &str, wire_values: &mut HashMap<String, usize>) {
-    let mut dependencies: HashMap<(&str, &str), HashSet<String>> = HashMap::new();
+    let mut dependencies: HashMap<(Operation, String), HashSet<String>> = HashMap::new();
 
     let mut s = vec![];
 
     for line in input.lines() {
-        let (mut left, mut right) = line.split_once("->").unwrap();
-
-        left = left.trim();
-        right = right.trim();
-
-        let deps = deps(left);
+        let (operation, wire_dest, deps) = parse(line);
 
         if deps.is_empty() {
-            s.push((left, right));
+            s.push((operation.clone(), wire_dest.clone()));
         }
 
-        dependencies.insert((left, right), deps);
+        dependencies.insert((operation, wire_dest), deps);
     }
 
     // https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
@@ -74,7 +96,7 @@ pub fn solve(input: &str, wire_values: &mut HashMap<String, usize>) {
             .iter_mut()
             .filter(|(_, v)| v.contains(&writes_to.to_string()))
         {
-            edge_deps.remove(writes_to);
+            edge_deps.remove(&writes_to);
 
             if edge_deps.is_empty() {
                 s.push(edge.clone());
@@ -83,58 +105,26 @@ pub fn solve(input: &str, wire_values: &mut HashMap<String, usize>) {
     }
 }
 
-fn execute_command(line: &str, wire_values: &HashMap<String, usize>) -> usize {
-    if let Some(captures) = VAL_RE.captures(line) {
-        return captures[1].parse().unwrap();
-    } else if let Some(captures) = AND_RE.captures(line) {
-        let left = captures[1]
-            .parse::<usize>()
-            .unwrap_or_else(|_| *wire_values.get(&captures[1]).unwrap());
+fn operand_or_wire_value(operand: String, wire_values: &HashMap<String, usize>) -> usize {
+    operand.parse::<usize>().unwrap_or_else(|_| wire_values[&operand])
+}
 
-        let right = captures[2]
-            .parse::<usize>()
-            .unwrap_or_else(|_| *wire_values.get(&captures[2]).unwrap());
-
-        return left & right;
-    } else if let Some(captures) = OR_RE.captures(line) {
-        let left = captures[1]
-            .parse::<usize>()
-            .unwrap_or_else(|_| *wire_values.get(&captures[1]).unwrap());
-
-        let right = captures[2]
-            .parse::<usize>()
-            .unwrap_or_else(|_| *wire_values.get(&captures[2]).unwrap());
-
-        return left | right;
-    } else if let Some(captures) = LSHIFT_RE.captures(line) {
-        let left = captures[1]
-            .parse::<usize>()
-            .unwrap_or_else(|_| *wire_values.get(&captures[1]).unwrap());
-
-        let right = captures[2].parse::<usize>().unwrap();
-
-        return left << right;
-    } else if let Some(captures) = RSHIFT_RE.captures(line) {
-        let left = captures[1]
-            .parse::<usize>()
-            .unwrap_or_else(|_| *wire_values.get(&captures[1]).unwrap());
-
-        let right = captures[2].parse::<usize>().unwrap();
-
-        return left >> right;
-    } else if let Some(captures) = NOT_RE.captures(line) {
-        let op = captures[1]
-            .parse::<usize>()
-            .unwrap_or_else(|_| *wire_values.get(&captures[1]).unwrap());
-
-        return !op;
-    } else if let Some(captures) = WRITE_RE.captures(line) {
-        let wire_value = *wire_values.get(&captures[1]).unwrap();
-
-        return wire_value;
+fn execute_command(operation: Operation, wire_values: &HashMap<String, usize>) -> usize {
+    dbg!(&operation);
+    dbg!(&wire_values);
+    match operation {
+        Operation::Value(operand) => operand,
+        Operation::Write(operand) => wire_values[&operand],
+        Operation::Not(operand) => !wire_values[&operand],
+        Operation::LShift(left_operand, right_operand) => wire_values[&left_operand] << right_operand,
+        Operation::RShift(left_operand, right_operand) => wire_values[&left_operand] >> right_operand,
+        Operation::And(left_operand, right_operand) => {
+            operand_or_wire_value(left_operand, wire_values) & operand_or_wire_value(right_operand, wire_values)
+        }
+        Operation::Or(left_operand, right_operand) => {
+            operand_or_wire_value(left_operand, wire_values) | operand_or_wire_value(right_operand, wire_values)
+        }
     }
-
-    panic!();
 }
 
 pub fn solve_part_1(input: &str) -> usize {
