@@ -84,7 +84,9 @@ pub fn solve<'a>(input: &'a str, wire_values: &mut HashMap<&'a str, usize>) {
     while !s.is_empty() {
         let (command, writes_to) = s.pop().unwrap();
 
-        wire_values.insert(writes_to, execute_command(command, wire_values));
+        if !wire_values.contains_key(writes_to) {
+            wire_values.insert(writes_to, execute_command(command, wire_values));
+        }
 
         for (edge, edge_deps) in dependencies.iter_mut().filter(|(_, v)| v.contains(writes_to)) {
             edge_deps.remove(writes_to);
@@ -151,6 +153,6 @@ mod tests {
 
     #[test]
     fn part2_real_input() {
-        assert_eq!(super::solve_part_2(&include_str!("day7/input")), 1);
+        assert_eq!(super::solve_part_2(&include_str!("day7/input")), 14_134);
     }
 }
