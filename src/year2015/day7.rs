@@ -3,76 +3,70 @@ use std::collections::{HashMap, HashSet};
 use regex::Regex;
 
 lazy_static! {
-    static ref VAL_RE: Regex = Regex::new(r"\A(\d+) ->").unwrap();
-    static ref AND_RE: Regex = Regex::new(r"\A(\w+) AND (\w+) ->").unwrap();
-    static ref OR_RE: Regex = Regex::new(r"\A(\w+) OR (\w+) ->").unwrap();
-    static ref LSHIFT_RE: Regex = Regex::new(r"\A(\w+) LSHIFT (\d+)").unwrap();
-    static ref RSHIFT_RE: Regex = Regex::new(r"\A(\w+) RSHIFT (\d+)").unwrap();
-    static ref NOT_RE: Regex = Regex::new(r"\ANOT (\w+) ->").unwrap();
-    static ref WRITE_RE: Regex = Regex::new(r"\A([a-zA-Z]+) ->").unwrap();
+    static ref VAL_RE: Regex = Regex::new(r"\A(\w+) ->").unwrap();
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
-enum Operation {
+enum Operation<'a> {
     Value(usize),
-    And(String, String),
-    Or(String, String),
-    LShift(String, usize),
-    RShift(String, usize),
-    Not(String),
-    Write(String),
+    And(&'a str, &'a str),
+    Or(&'a str, &'a str),
+    LShift(&'a str, usize),
+    RShift(&'a str, usize),
+    Not(&'a str),
+    Write(&'a str),
 }
 
-fn parse(line: &str) -> (Operation, String, HashSet<String>) {
+fn parse(line: &str) -> (Operation, &str, HashSet<&str>) {
     let operation;
-    let mut deps = HashSet::new();
+    let mut deps: HashSet<&str> = HashSet::new();
 
-    if let Some(captures) = VAL_RE.captures(line) {
-        operation = Operation::Value(captures[1].parse().unwrap());
+    let (command, writes_to) = line.split_once("->").unwrap();
 
-        if captures[1].parse::<usize>().is_err() {
-            deps.insert(captures[1].to_string());
+    if VAL_RE.is_match(line) {
+        match command.trim().parse::<usize>() {
+            Ok(val) => operation = Operation::Value(val),
+            Err(_) => {
+                operation = Operation::Write(command.trim());
+                deps.insert(command.trim());
+            }
         }
-    } else if let Some(captures) = AND_RE.captures(line) {
-        operation = Operation::And(captures[1].to_string(), captures[2].to_string());
+    } else if let Some((left_operand, right_operand)) = command.split_once("AND") {
+        operation = Operation::And(left_operand.trim(), right_operand.trim());
 
-        if captures[1].parse::<usize>().is_err() {
-            deps.insert(captures[1].to_string());
+        if left_operand.trim().parse::<usize>().is_err() {
+            deps.insert(left_operand.trim());
         }
-        if captures[2].parse::<usize>().is_err() {
-            deps.insert(captures[2].to_string());
+        if right_operand.trim().parse::<usize>().is_err() {
+            deps.insert(right_operand.trim());
         }
-    } else if let Some(captures) = OR_RE.captures(line) {
-        operation = Operation::Or(captures[1].to_string(), captures[2].to_string());
+    } else if let Some((left_operand, right_operand)) = command.split_once("OR") {
+        operation = Operation::Or(left_operand.trim(), right_operand.trim());
 
-        if captures[1].parse::<usize>().is_err() {
-            deps.insert(captures[1].to_string());
+        if left_operand.trim().parse::<usize>().is_err() {
+            deps.insert(left_operand.trim());
         }
-        if captures[2].parse::<usize>().is_err() {
-            deps.insert(captures[2].to_string());
+        if right_operand.trim().parse::<usize>().is_err() {
+            deps.insert(right_operand.trim());
         }
-    } else if let Some(captures) = LSHIFT_RE.captures(line) {
-        operation = Operation::LShift(captures[1].to_string(), captures[2].parse().unwrap());
-        deps.insert(captures[1].to_string());
-    } else if let Some(captures) = RSHIFT_RE.captures(line) {
-        operation = Operation::RShift(captures[1].to_string(), captures[2].parse().unwrap());
-        deps.insert(captures[1].to_string());
-    } else if let Some(captures) = NOT_RE.captures(line) {
-        operation = Operation::Not(captures[1].to_string());
-        deps.insert(captures[1].to_string());
-    } else if let Some(captures) = WRITE_RE.captures(line) {
-        operation = Operation::Write(captures[1].to_string());
-        deps.insert(captures[1].to_string());
+    } else if let Some((left_operand, right_operand)) = command.split_once("LSHIFT") {
+        operation = Operation::LShift(left_operand.trim(), right_operand.trim().parse().unwrap());
+        deps.insert(left_operand.trim());
+    } else if let Some((left_operand, right_operand)) = command.split_once("RSHIFT") {
+        operation = Operation::RShift(left_operand.trim(), right_operand.trim().parse().unwrap());
+        deps.insert(left_operand.trim());
+    } else if let Some((_, operand)) = command.split_once("NOT") {
+        operation = Operation::Not(operand.trim());
+        deps.insert(operand.trim());
     } else {
-        dbg!(&line);
         panic!();
     }
 
-    (operation, line.split_once("->").unwrap().1.trim().to_string(), deps)
+    (operation, writes_to.trim(), deps)
 }
 
-pub fn solve(input: &str, wire_values: &mut HashMap<String, usize>) {
-    let mut dependencies: HashMap<(Operation, String), HashSet<String>> = HashMap::new();
+pub fn solve<'a>(input: &'a str, wire_values: &mut HashMap<&'a str, usize>) {
+    let mut dependencies: HashMap<(Operation, &str), HashSet<&str>> = HashMap::new();
 
     let mut s = vec![];
 
@@ -80,7 +74,7 @@ pub fn solve(input: &str, wire_values: &mut HashMap<String, usize>) {
         let (operation, wire_dest, deps) = parse(line);
 
         if deps.is_empty() {
-            s.push((operation.clone(), wire_dest.clone()));
+            s.push((operation.clone(), wire_dest));
         }
 
         dependencies.insert((operation, wire_dest), deps);
@@ -90,13 +84,10 @@ pub fn solve(input: &str, wire_values: &mut HashMap<String, usize>) {
     while !s.is_empty() {
         let (command, writes_to) = s.pop().unwrap();
 
-        wire_values.insert(writes_to.to_string(), execute_command(command, wire_values));
+        wire_values.insert(writes_to, execute_command(command, wire_values));
 
-        for (edge, edge_deps) in dependencies
-            .iter_mut()
-            .filter(|(_, v)| v.contains(&writes_to.to_string()))
-        {
-            edge_deps.remove(&writes_to);
+        for (edge, edge_deps) in dependencies.iter_mut().filter(|(_, v)| v.contains(writes_to)) {
+            edge_deps.remove(writes_to);
 
             if edge_deps.is_empty() {
                 s.push(edge.clone());
@@ -105,19 +96,17 @@ pub fn solve(input: &str, wire_values: &mut HashMap<String, usize>) {
     }
 }
 
-fn operand_or_wire_value(operand: String, wire_values: &HashMap<String, usize>) -> usize {
-    operand.parse::<usize>().unwrap_or_else(|_| wire_values[&operand])
+fn operand_or_wire_value(operand: &str, wire_values: &HashMap<&str, usize>) -> usize {
+    operand.parse::<usize>().unwrap_or_else(|_| wire_values[operand])
 }
 
-fn execute_command(operation: Operation, wire_values: &HashMap<String, usize>) -> usize {
-    dbg!(&operation);
-    dbg!(&wire_values);
+fn execute_command(operation: Operation, wire_values: &HashMap<&str, usize>) -> usize {
     match operation {
         Operation::Value(operand) => operand,
-        Operation::Write(operand) => wire_values[&operand],
-        Operation::Not(operand) => !wire_values[&operand],
-        Operation::LShift(left_operand, right_operand) => wire_values[&left_operand] << right_operand,
-        Operation::RShift(left_operand, right_operand) => wire_values[&left_operand] >> right_operand,
+        Operation::Write(operand) => wire_values[operand],
+        Operation::Not(operand) => !wire_values[operand],
+        Operation::LShift(left_operand, right_operand) => wire_values[left_operand] << right_operand,
+        Operation::RShift(left_operand, right_operand) => wire_values[left_operand] >> right_operand,
         Operation::And(left_operand, right_operand) => {
             operand_or_wire_value(left_operand, wire_values) & operand_or_wire_value(right_operand, wire_values)
         }
@@ -138,7 +127,7 @@ pub fn solve_part_2(input: &str) -> usize {
     solve(input, &mut wires_first_run);
 
     let mut wires_second_run = HashMap::new();
-    wires_second_run.insert("b".to_string(), wires_first_run["a"]);
+    wires_second_run.insert("b", wires_first_run["a"]);
     solve(input, &mut wires_second_run);
 
     wires_second_run["a"]
