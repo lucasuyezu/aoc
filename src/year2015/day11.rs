@@ -53,25 +53,23 @@ pub fn solve(s: &str) -> String {
     }
 }
 
-pub fn solve_part_1(input: &str) -> usize {
-    solve(input);
-    0
+pub fn solve_part_1(input: &str) -> String {
+    solve(input)
 }
 
-pub fn solve_part_2(input: &str) -> usize {
-    solve(input);
-    0
+pub fn solve_part_2(input: &str) -> String {
+    solve(input)
 }
 
 #[cfg(test)]
 mod tests {
     #[test]
     fn part1() {
-        assert_eq!(super::solve(&"cqjxjnds"), String::from("cqjxxyzz"));
+        assert_eq!(super::solve_part_1(&"cqjxjnds"), String::from("cqjxxyzz"));
     }
 
     #[test]
     fn part2() {
-        assert_eq!(super::solve(&"cqjxxyzz"), String::from("cqkaabcc"));
+        assert_eq!(super::solve_part_2(&"cqjxxyzz"), String::from("cqkaabcc"));
     }
 }
