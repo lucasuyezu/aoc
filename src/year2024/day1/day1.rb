@@ -27,8 +27,11 @@ def solve_part_2 lines
     right << right_ele.to_i
   end
 
+  tally = Hash.new(0)
+  right.tally(tally)
+
   left
-    .map { |left_ele| left_ele * right.select { |right_ele| right_ele == left_ele }.size }
+    .map { |left_ele| left_ele * tally[left_ele] }
     .sum
 end
 
