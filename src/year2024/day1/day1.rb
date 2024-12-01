@@ -13,9 +13,8 @@ def solve_part_1 lines
 
   left
     .each_with_index
-    .map { |ele, idx| [ele, right[idx]].sort.reduce(&:-) }
+    .map { |ele, idx| (ele - right[idx]).abs }
     .sum
-    .abs
 end
 
 def solve_part_2 lines
