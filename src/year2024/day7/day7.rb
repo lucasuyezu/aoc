@@ -1,48 +1,36 @@
 #!/usr/bin/env ruby
 
-def pah(operands, concat)
-  result = []
+def pah(target, operands, concat)
+  return false if operands[0] > target
+
+  sum = operands[0] + operands[1]
+  mul = operands[0] * operands[1]
+  cct = "#{operands[0]}#{operands[1]}".to_i if concat
 
   if operands.size == 2
-    result << operands[0] + operands[1]
-    result << operands[0] * operands[1]
-    result << "#{operands[0]}#{operands[1]}".to_i if concat
-
-    return result
+    return sum == target || mul == target || (concat && cct == target)
   end
 
-  rest = operands[2,operands.size]
+  rest = operands[2..]
 
-  result += pah([ operands[0] + operands[1] ] + rest, concat)
-  result += pah([ operands[0] * operands[1] ] + rest, concat)
-  result += pah(["#{operands[0]}#{operands[1]}".to_i] + rest, concat) if concat
-
-  result
+  pah(target, [ sum ] + rest, concat) ||
+  pah(target, [ mul ] + rest, concat) ||
+  (concat && pah(target, [ cct ] + rest, concat))
 end
 
 def solve_part_1 input
   input
     .lines
-    .filter_map do |line|
-      line = line.split(":")
-      result = line.first.to_i
-      operands = line.last.split.map(&:to_i)
-
-      result if pah(operands, false).any? { it == result }
-    end
+    .map { it.gsub(":", " ").split.map(&:to_i) }
+    .filter_map { |target, *operands| target if pah(target, operands, false) }
     .sum
 end
 
 def solve_part_2 input
   input
     .lines
-    .filter_map do |line|
-      line = line.split(":")
-      result = line.first.to_i
-      operands = line.last.split.map(&:to_i)
-
-      result if pah(operands, true).any? { it == result }
-    end
+    .map { it.gsub(":", " ").split.map(&:to_i) }
+    .filter_map { |target, *operands| target if pah(target, operands, true) }
     .sum
 end
 
