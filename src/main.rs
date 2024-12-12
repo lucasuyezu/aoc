@@ -11,6 +11,7 @@ mod year2020;
 mod year2021;
 mod year2022;
 mod year2023;
+mod year2024;
 
 macro_rules! solve_str {
     ($year:ident, $day:ident) => {
@@ -68,6 +69,7 @@ fn duration_with_colour(duration: Duration) -> String {
 }
 
 fn main() {
+    solve_str!(year2024, day1);
     solve_str!(year2023, day23);
     solve_str!(year2023, day22);
     solve_str!(year2023, day21);
@@ -127,6 +129,7 @@ fn main() {
     solve_str!(year2020, day3);
     solve_str!(year2020, day2);
     solve_str!(year2020, day1);
+    solve_str!(year2015, day15);
     solve_str!(year2015, day14);
     solve_str!(year2015, day13);
     solve_str!(year2015, day12);
