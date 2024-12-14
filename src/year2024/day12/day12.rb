@@ -2,39 +2,84 @@
 
 Point = Struct.new(:x, :y)
 
-DIRECTIONS = [
-  Point.new(-1, 0),
-  Point.new(0, 1),
-  Point.new(1, 0),
-  Point.new(0, -1)
-]
+DIRECTIONS = {
+  "^" => Point.new(-1, 0),
+  ">" => Point.new(0, 1),
+  "v" => Point.new(1, 0),
+  "<" => Point.new(0, -1),
+}
 
 def map_region(grid, x_range, y_range, pos, char, visited, region)
   visited << pos
   region << pos
 
-  DIRECTIONS.each do |dir|
+  DIRECTIONS.values.each do |dir|
     n = Point.new(pos.x + dir.x, pos.y + dir.y)
 
     next if visited.include?(n)
-
     next unless x_range.include?(n.x) && y_range.include?(n.y)
     next unless grid[n.x][n.y] == char
 
-    puts "Adding plot #{n} to region #{char}"
     map_region(grid, x_range, y_range, n, char, visited, region)
   end
 end
 
 def perimeter(region)
-  puts "Calculating perimeter for region #{region}"
-
   region.sum do |plot|
-    4 - DIRECTIONS.count { region.include?(Point.new(plot.x + it.x, plot.y + it.y)) }
+    4 - DIRECTIONS.values.count { region.include?(Point.new(plot.x + it.x, plot.y + it.y)) }
   end
 end
 
-def solve_part_1(input)
+def sides(region)
+  region.sum do |plot|
+    corners = 0
+
+    south = Point.new(plot.x + DIRECTIONS["v"].x, plot.y + DIRECTIONS["v"].y)
+    west  = Point.new(plot.x + DIRECTIONS["<"].x, plot.y + DIRECTIONS["<"].y)
+    east  = Point.new(plot.x + DIRECTIONS[">"].x, plot.y + DIRECTIONS[">"].y)
+    north = Point.new(plot.x + DIRECTIONS["^"].x, plot.y + DIRECTIONS["^"].y)
+
+    if !region.include?(south) && !region.include?(west)
+      corners += 1
+    end
+
+    if !region.include?(west) && !region.include?(north)
+      corners += 1
+    end
+
+    if !region.include?(north) && !region.include?(east)
+      corners += 1
+    end
+
+    if !region.include?(east) && !region.include?(south)
+      corners += 1
+    end
+
+    northeast = Point.new(plot.x + DIRECTIONS["^"].x + DIRECTIONS[">"].x, plot.y + DIRECTIONS["^"].y + DIRECTIONS[">"].y)
+    if region.include?(north) && region.include?(east) && !region.include?(northeast)
+      corners += 1
+    end
+
+    northwest = Point.new(plot.x + DIRECTIONS["^"].x + DIRECTIONS["<"].x, plot.y + DIRECTIONS["^"].y + DIRECTIONS["<"].y)
+    if region.include?(north) && region.include?(west) && !region.include?(northwest)
+      corners += 1
+    end
+
+    southeast = Point.new(plot.x + DIRECTIONS["v"].x + DIRECTIONS[">"].x, plot.y + DIRECTIONS["v"].y + DIRECTIONS[">"].y)
+    if region.include?(south) && region.include?(east) && !region.include?(southeast)
+      corners += 1
+    end
+
+    southwest = Point.new(plot.x + DIRECTIONS["v"].x + DIRECTIONS["<"].x, plot.y + DIRECTIONS["v"].y + DIRECTIONS["<"].y)
+    if region.include?(south) && region.include?(west) && !region.include?(southwest)
+      corners += 1
+    end
+
+    corners
+  end
+end
+
+def regions(input)
   grid = input.lines
   x_range = 0...grid.size
   y_range = 0...(grid.first.size - 1) # last char is \n
@@ -47,23 +92,21 @@ def solve_part_1(input)
       pos = Point.new(x, y)
       next if visited.include?(pos)
 
-      puts
-      puts "Starting region at plot #{pos} with value #{char}"
       region = Set.new
       map_region(grid, x_range, y_range, pos, char, visited, region)
-      puts "Region has #{region.size} plots"
       regions << region
     end
   end
 
-  # puts visited.inspect
-  # puts regions.inspect
+  regions
+end
 
-  regions.sum { it.size  * perimeter(it) }
+def solve_part_1(input)
+  regions(input).sum { it.size  * perimeter(it) }
 end
 
 def solve_part_2(input)
-  raise NotImplementedError
+  regions(input).sum { it.size * sides(it) }
 end
 
 require 'minitest/autorun'
@@ -78,10 +121,10 @@ class Day1Test < Minitest::Test
   end
 
   def test_part_2_sample_input
-    assert_equal(0, solve_part_2(File.read("test_input")))
+    assert_equal(1206, solve_part_2(File.read("test_input")))
   end
 
   def test_part_2_real_input
-    assert_equal(0, solve_part_2(File.read("input")))
+    assert_equal(787680, solve_part_2(File.read("input")))
   end
 end
