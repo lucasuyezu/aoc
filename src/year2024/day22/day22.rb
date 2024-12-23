@@ -8,7 +8,6 @@ def new_secret(secret)
   secret %= 16777216
 
   secret ^= (secret / 32)
-  secret %= 16777216
 
   secret ^= (secret * 2048)
   secret %= 16777216
@@ -27,10 +26,8 @@ def build_sequences(input, build_cache=false)
       sequence.price_list << cur
 
       if build_cache && n >= 4
-        range = n-3..n
-        cache_key = sequence.price_list[range].map(&:delta).join(",")
-        value = sequence.price_list[n].digit
-        sequence.cache[cache_key] = value unless sequence.cache.key? cache_key
+        cache_key = "#{sequence.price_list[n-3].delta},#{sequence.price_list[n-2].delta},#{sequence.price_list[n-1].delta},#{sequence.price_list[n].delta}"
+        sequence.cache[cache_key] = cur.digit unless sequence.cache.key? cache_key
       end
 
       prev = cur
@@ -57,8 +54,7 @@ def solve_part_2(input)
     puts "Testing sequence #{i + 1}/#{sequences.size} (#{cache_hits} cache hits)"
     outer_list = outer_sequence.price_list
     1.upto(outer_list.size - 4) do |n|
-      outer_range = n...n+4
-      outer_seq = outer_list[outer_range].map(&:delta).join(",")
+      outer_seq = "#{outer_list[n].delta},#{outer_list[n + 1].delta},#{outer_list[n + 2].delta},#{outer_list[n + 3].delta}"
 
       if cache.include? outer_seq
         cache_hits += 1
