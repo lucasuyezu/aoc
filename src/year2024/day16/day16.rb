@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
+require 'lazy_priority_queue'
 
 Point = Struct.new(:x, :y)
-Node = Struct.new(:pos, :dir, :dist)
+Node = Struct.new(:pos, :dir, :dist, :path)
 
 DIRECTIONS = [
   Point.new(-1, 0),
@@ -10,85 +11,92 @@ DIRECTIONS = [
   Point.new(0, -1),
 ]
 
-def solve_part_1(input)
+def build_grid(input)
   grid = input.lines
 
   start_idx = input.index("S")
   start_pos = Point.new(start_idx / grid.first.size, start_idx % grid.first.size)
 
-  queue = [Node.new(start_pos, 1, 0)]
+  end_idx = input.index("E")
+  end_pos = Point.new(end_idx / grid.first.size, end_idx % grid.first.size)
 
-  goals = []
+  [start_pos, end_pos, grid]
+end
 
-  distances = {}
-  distances[start_pos] = 0
+def dijkstra(grid, start, dir, goal)
+  queue = MinPriorityQueue.new
+  queue.enqueue(Node.new(start, dir, 0, [start]), 0)
 
-  while queue.any?
-    node = queue.shift
-    puts node.inspect
+  dists = Hash.new(1e10)
+  dists[Node.new(start, dir)] = 0
 
-    neighbours = [
+  visited = Set.new
+
+  min_dist = 1e10
+
+  while !queue.empty?
+    node = queue.pop
+
+    next if node.dist > dists[Node.new(node.pos, node.dir)]
+
+    if node.pos == goal
+      if node.dist <= min_dist
+        min_dist = node.dist
+        visited += node.path
+      end
+      next
+    end
+
+    [
       {dir: node.dir, dist: 1},
       {dir: (node.dir + 1) % DIRECTIONS.size, dist: 1001},
       {dir: (node.dir - 1) % DIRECTIONS.size, dist: 1001},
-    ].filter_map do |n|
-      dir = DIRECTIONS[n[:dir]]
-      n_pos = Point.new(node.pos.x + dir.x, node.pos.y + dir.y)
-
-      n_dist = node.dist + n[:dist]
-
-      goals << n_dist if grid[n_pos.x][n_pos.y] == "E"
-
-      min_dist = n_dist < distances.fetch(n_pos, 10_000_000_000)
-
-      if min_dist
-        distances[n_pos] = n_dist
-      end
-
-      Node.new(
-        n_pos,
+    ].each do |n|
+      nn = Node.new(
+        nil,
         n[:dir],
-        n_dist,
-      ) if grid[n_pos.x][n_pos.y] == "." && min_dist
-    end
+        node.dist + n[:dist],
+        node.path.dup
+      )
+      nn.pos = Point.new(node.pos.x + DIRECTIONS[nn.dir].x, node.pos.y + DIRECTIONS[nn.dir].y)
+      nn.path << nn.pos
 
-    queue += neighbours
-    # puts queue.inspect
-    # puts visited.inspect
+      n_char = grid[nn.pos.x][nn.pos.y]
+
+      dist_key = Node.new(nn.pos, nn.dir)
+      if n_char != "#" && nn.dist <= dists[dist_key]
+        dists[dist_key] = nn.dist
+        queue.enqueue(nn, nn.dist)
+      end
+    end
   end
 
-  puts goals
-  goals.min
+  [min_dist, visited]
 end
 
-def solve_part_2(input)
-  raise NotImplementedError
+def solve(input)
+  start, goal, grid = build_grid(input)
+  dijkstra(grid, start, 1, goal)
 end
 
 require 'minitest/autorun'
 
 class Day1Test < Minitest::Test
-  def test_part_1_sample_small
-    assert_equal(7036, solve_part_1(File.read("test_input_small")))
+  def test_sample_input_small
+    min_dist, visited = solve(File.read("test_input_small"))
+    assert_equal(7036, min_dist)
+    assert_equal(45, visited.size)
   end
 
-  def test_part_1_sample_large
-    assert_equal(11048, solve_part_1(File.read("test_input")))
+  def test_sample_input_large
+    min_dist, visited = solve(File.read("test_input"))
+    assert_equal(11048, min_dist)
+    assert_equal(64, visited.size)
   end
 
-  def test_part_1_real
-    assert_equal(75416, solve_part_1(File.read("input")))
-  end
-
-  def test_part_2_sample_small
-    assert_equal(618, solve_part_2(File.read("test_input_small_p2")))
-  end
-
-  def test_part_2_sample_large
-    assert_equal(9021, solve_part_2(File.read("test_input")))
-  end
-
-  def test_part_2_real
-    assert_equal(1453087, solve_part_2(File.read("input")))
+  def test_real_input
+    min_dist, visited = solve(File.read("input"))
+    assert_equal(75416, min_dist)
+    assert_equal(476, visited.size)
   end
 end
