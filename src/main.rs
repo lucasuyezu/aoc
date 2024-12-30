@@ -20,7 +20,7 @@ macro_rules! solve_str {
         {
             let now = Instant::now();
             let lines = fs::read_to_string(format!(
-                "/Users/lucas/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
+                "/Users/coralton/src/github.com/lucasuyezu/aoc/src/{}/{}/input",
                 stringify!($year),
                 stringify!($day)
             ))
