@@ -14,23 +14,6 @@ struct Node {
     dir: i8,
 }
 
-impl Ord for Node {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other
-            .pos
-            .x
-            .cmp(&self.pos.x)
-            .then_with(|| self.pos.y.cmp(&other.pos.y))
-            .then_with(|| self.dir.cmp(&other.dir))
-    }
-}
-
-impl PartialOrd for Node {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
 #[derive(Clone, Hash, PartialEq, Eq, Debug)]
 struct State {
     node: Node,
@@ -40,7 +23,7 @@ struct State {
 
 impl Ord for State {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other.cost.cmp(&self.cost).then_with(|| self.node.cmp(&other.node))
+        other.cost.cmp(&self.cost)
     }
 }
 
