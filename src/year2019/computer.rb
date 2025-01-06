@@ -1,20 +1,116 @@
 #!/usr/bin/env ruby
 
-class Computer
-  def self.execute!(memory, ip=0)
-    while memory[ip] != 99
-      memory[memory[ip+3]] = case memory[ip]
-                             when 1
-                               memory[memory[ip+1]] + memory[memory[ip+2]]
-                             when 2
-                               memory[memory[ip+1]] * memory[memory[ip+2]]
-                             else
-                               raise "Invalid opcode #{memory[ip].inspect} at address #{ip}"
-                             end
+class OpCode1
+  def self.execute(memory, ip, param_modes, input, output)
+    param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
+    param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
 
-      ip += 4
-    end
+    memory[memory[ip+3]] = param1 + param2
 
-    memory
+    [ip + 4]
   end
 end
+
+class OpCode2
+  def self.execute(memory, ip, param_modes, input, output)
+    param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
+    param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
+
+    memory[memory[ip+3]] = param1 * param2
+
+    [ip + 4]
+  end
+end
+
+class OpCode3
+  def self.execute(memory, ip, param_modes, input, output)
+    param = input.shift
+    memory[memory[ip+1]] = param
+
+    [ip + 2]
+  end
+end
+
+class OpCode4
+  def self.execute(memory, ip, param_modes, input, output)
+    param = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
+    output << param
+
+    [ip + 2]
+  end
+end
+
+class OpCode5
+  def self.execute(memory, ip, param_modes, input, output)
+    param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
+    param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
+
+    param1.zero? ? [ip + 3] : [param2]
+  end
+end
+
+class OpCode6
+  def self.execute(memory, ip, param_modes, input, output)
+    param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
+    param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
+
+    param1.zero? ? [param2] : [ip + 3]
+  end
+end
+
+class OpCode7
+  def self.execute(memory, ip, param_modes, input, output)
+    param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
+    param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
+
+    memory[memory[ip+3]] = param1 < param2 ? 1 : 0
+
+    [ip + 4]
+  end
+end
+
+class OpCode8
+  def self.execute(memory, ip, param_modes, input, output)
+    param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
+    param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
+
+    memory[memory[ip+3]] = param1 == param2 ? 1 : 0
+
+    [ip + 4]
+  end
+end
+
+
+class Computer
+  OPCODES = {
+    1 => OpCode1,
+    2 => OpCode2,
+    3 => OpCode3,
+    4 => OpCode4,
+    5 => OpCode5,
+    6 => OpCode6,
+    7 => OpCode7,
+    8 => OpCode8,
+  }
+  def self.execute!(memory, input=nil, ip=0)
+    output = []
+
+    while memory[ip] != 99
+      ins = memory[ip]
+      opcode = ins % 100
+
+      param_modes = []
+
+      param_modes << (ins / 100) % 10
+      param_modes << (ins / 1000) % 10
+      param_modes << (ins / 10000) % 10
+
+      result = OPCODES[opcode].execute(memory, ip, param_modes, input, output)
+
+      ip = result[0]
+    end
+
+    output
+  end
+end
+

@@ -2,10 +2,6 @@
 
 require_relative '../computer'
 
-def solve_part_1(input)
-  Computer.execute!(input.chomp.split(",").map(&:to_i))
-end
-
 def solve_part_2(input)
   program = input.chomp.split(",").map(&:to_i)
 
@@ -26,19 +22,33 @@ end
 
 require 'minitest/autorun'
 
-class Day1Test < Minitest::Test
+class Day2Test < Minitest::Test
   def test_part_1_sample
-    assert_equal("3500,9,10,70,2,3,11,0,99,30,40,50", solve_part_1("1,9,10,3,2,3,11,0,99,30,40,50").join(","))
-    assert_equal("2,0,0,0,99", solve_part_1("1,0,0,0,99").join(","))
-    assert_equal("2,3,0,6,99", solve_part_1("2,3,0,3,99").join(","))
-    assert_equal("30,1,1,4,2,5,6,0,99", solve_part_1("1,1,1,4,99,5,6,0,99").join(","))
+    memory = "1,9,10,3,2,3,11,0,99,30,40,50".split(",").map(&:to_i)
+    Computer.execute!(memory)
+    assert_equal("3500,9,10,70,2,3,11,0,99,30,40,50", memory.join(","))
+
+    memory = "1,0,0,0,99".split(",").map(&:to_i)
+    Computer.execute!(memory)
+    assert_equal("2,0,0,0,99", memory.join(","))
+
+    memory = "2,3,0,3,99".split(",").map(&:to_i)
+    Computer.execute!(memory)
+    assert_equal("2,3,0,6,99", memory.join(","))
+
+    memory = "1,1,1,4,99,5,6,0,99".split(",").map(&:to_i)
+    Computer.execute!(memory)
+    assert_equal("30,1,1,4,2,5,6,0,99", memory.join(","))
   end
 
   def test_part_1_real
-    input = File.read("input").chomp.split(",")
-    input[1] = 12
-    input[2] = 2
-    assert_equal(10566835, solve_part_1(input.join(","))[0])
+    memory = File.read("input").chomp.split(",").map(&:to_i)
+    memory[1] = 12
+    memory[2] = 2
+
+    Computer.execute!(memory)
+
+    assert_equal(10566835, memory[0])
   end
 
   def test_part_2_real
