@@ -6,9 +6,7 @@ require 'minitest/autorun'
 
 class Day5Test < Minitest::Test
   def test_part_1_sample
-    memory = [1002,4,3,4,33]
-    Computer.execute!(memory).join
-    assert_equal([1002, 4, 3, 4, 99], memory)
+    assert_equal([1002, 4, 3, 4, 99], Computer.new(memory: [1002,4,3,4,33]).execute_sync.memory)
   end
 
   def test_part_1_real
@@ -19,7 +17,7 @@ class Day5Test < Minitest::Test
 
     input_queue << 1
 
-    Computer.execute!(memory, input_queue, output_queue).join
+    computer = Computer.new(memory:, input_queue:, output_queue:).execute_sync
 
     result = nil
     output_queue.size.times { result = output_queue.pop }
@@ -35,7 +33,7 @@ class Day5Test < Minitest::Test
 
     input_queue << 5
 
-    Computer.execute!(memory, input_queue, output_queue).join
+    computer = Computer.new(memory:, input_queue:, output_queue:).execute_sync
 
     result = nil
     output_queue.size.times { result = output_queue.pop }

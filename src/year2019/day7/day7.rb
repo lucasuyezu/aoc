@@ -22,11 +22,11 @@ def solve_part_1(memory)
 
     out_e = Thread::Queue.new
 
-    Computer.execute!(memory.dup, in_a,       out_a_in_b)
-    Computer.execute!(memory.dup, out_a_in_b, out_b_in_c)
-    Computer.execute!(memory.dup, out_b_in_c, out_c_in_d)
-    Computer.execute!(memory.dup, out_c_in_d, out_d_in_e)
-    Computer.execute!(memory.dup, out_d_in_e, out_e)
+    Computer.new(memory: memory.dup, input_queue: in_a,       output_queue: out_a_in_b).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_a_in_b, output_queue: out_b_in_c).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_b_in_c, output_queue: out_c_in_d).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_c_in_d, output_queue: out_d_in_e).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_d_in_e, output_queue: out_e).execute_async
 
     out_e.pop
   end.max
@@ -50,11 +50,11 @@ def solve_part_2(memory)
     out_d_in_e = Thread::Queue.new
     out_d_in_e << phase_setting[4]
 
-    Computer.execute!(memory.dup, out_e_in_a, out_a_in_b)
-    Computer.execute!(memory.dup, out_a_in_b, out_b_in_c)
-    Computer.execute!(memory.dup, out_b_in_c, out_c_in_d)
-    Computer.execute!(memory.dup, out_c_in_d, out_d_in_e)
-    Computer.execute!(memory.dup, out_d_in_e, out_e_in_a).join
+    Computer.new(memory: memory.dup, input_queue: out_e_in_a, output_queue: out_a_in_b).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_a_in_b, output_queue: out_b_in_c).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_b_in_c, output_queue: out_c_in_d).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_c_in_d, output_queue: out_d_in_e).execute_async
+    Computer.new(memory: memory.dup, input_queue: out_d_in_e, output_queue: out_e_in_a).execute_sync
 
     out_e_in_a.pop
   end.max
