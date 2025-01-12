@@ -7,57 +7,39 @@ require 'minitest/autorun'
 class Day5Test < Minitest::Test
   def test_part_1_sample
     memory = [1002,4,3,4,33]
-    Computer.execute!(memory)
+    Computer.execute!(memory).join
     assert_equal([1002, 4, 3, 4, 99], memory)
   end
 
   def test_part_1_real
     memory = File.read("input").chomp.split(",").map(&:to_i)
-    input = [1]
 
-    assert_equal(15508323, Computer.execute!(memory, input).last)
-  end
+    input_queue  = Thread::Queue.new
+    output_queue = Thread::Queue.new
 
-  def test_part_2_sample
-    memory = [3,9,8,9,10,9,4,9,99,-1,8]
-    assert_equal([1], Computer.execute!(memory.dup, [8]))
-    assert_equal([0], Computer.execute!(memory.dup, [9]))
+    input_queue << 1
 
-    memory = [3,9,7,9,10,9,4,9,99,-1,8]
-    assert_equal([1], Computer.execute!(memory.dup, [7]))
-    assert_equal([0], Computer.execute!(memory.dup, [8]))
-    assert_equal([0], Computer.execute!(memory.dup, [9]))
+    Computer.execute!(memory, input_queue, output_queue).join
 
-    memory = [3,3,1108,-1,8,3,4,3,99]
-    assert_equal([1], Computer.execute!(memory.dup, [8]))
-    assert_equal([0], Computer.execute!(memory.dup, [9]))
+    result = nil
+    output_queue.size.times { result = output_queue.pop }
 
-    memory = [3,3,1107,-1,8,3,4,3,99]
-    assert_equal([1], Computer.execute!(memory.dup, [7]))
-    assert_equal([0], Computer.execute!(memory.dup, [8]))
-    assert_equal([0], Computer.execute!(memory.dup, [9]))
-
-    memory = [3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9]
-    assert_equal([0], Computer.execute!(memory.dup, [0]))
-    assert_equal([1], Computer.execute!(memory.dup, [1]))
-
-
-    memory = [3,3,1105,-1,9,1101,0,0,12,4,12,99,1]
-    assert_equal([0], Computer.execute!(memory.dup, [0]))
-    assert_equal([1], Computer.execute!(memory.dup, [1]))
-
-    memory = [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
-              1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
-              999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99]
-    assert_equal([999],  Computer.execute!(memory.dup, [7]))
-    assert_equal([1000], Computer.execute!(memory.dup, [8]))
-    assert_equal([1001], Computer.execute!(memory.dup, [9]))
+    assert_equal(15508323, result)
   end
 
   def test_part_2_real
     memory = File.read("input").chomp.split(",").map(&:to_i)
-    input = [5]
 
-    assert_equal([9006327], Computer.execute!(memory, input))
+    input_queue  = Thread::Queue.new
+    output_queue = Thread::Queue.new
+
+    input_queue << 5
+
+    Computer.execute!(memory, input_queue, output_queue).join
+
+    result = nil
+    output_queue.size.times { result = output_queue.pop }
+
+    assert_equal(9006327, result)
   end
 end

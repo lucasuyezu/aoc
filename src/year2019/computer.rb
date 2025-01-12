@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 class OpCode1
-  def self.execute(memory, ip, param_modes, input, output)
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
     param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
     param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
 
@@ -12,7 +12,7 @@ class OpCode1
 end
 
 class OpCode2
-  def self.execute(memory, ip, param_modes, input, output)
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
     param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
     param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
 
@@ -23,25 +23,25 @@ class OpCode2
 end
 
 class OpCode3
-  def self.execute(memory, ip, param_modes, input, output)
-    param = input.shift
-    memory[memory[ip+1]] = param
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
+    memory[memory[ip+1]] = input_queue.pop
 
     [ip + 2]
   end
 end
 
 class OpCode4
-  def self.execute(memory, ip, param_modes, input, output)
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
     param = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
-    output << param
+
+    output_queue << param
 
     [ip + 2]
   end
 end
 
 class OpCode5
-  def self.execute(memory, ip, param_modes, input, output)
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
     param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
     param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
 
@@ -50,7 +50,7 @@ class OpCode5
 end
 
 class OpCode6
-  def self.execute(memory, ip, param_modes, input, output)
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
     param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
     param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
 
@@ -59,7 +59,7 @@ class OpCode6
 end
 
 class OpCode7
-  def self.execute(memory, ip, param_modes, input, output)
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
     param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
     param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
 
@@ -70,7 +70,7 @@ class OpCode7
 end
 
 class OpCode8
-  def self.execute(memory, ip, param_modes, input, output)
+  def self.execute(memory, ip, param_modes, input_queue, output_queue)
     param1 = param_modes[0] == 0 ? memory[memory[ip+1]] : memory[ip+1]
     param2 = param_modes[1] == 0 ? memory[memory[ip+2]] : memory[ip+2]
 
@@ -92,25 +92,26 @@ class Computer
     7 => OpCode7,
     8 => OpCode8,
   }
-  def self.execute!(memory, input=nil, ip=0)
-    output = []
+  def self.execute!(memory, input_queue=nil, output_queue=nil, ip=0)
+    Thread.new do
+      while memory[ip] != 99
+        ins = memory[ip]
+        opcode = ins % 100
 
-    while memory[ip] != 99
-      ins = memory[ip]
-      opcode = ins % 100
+        param_modes = []
 
-      param_modes = []
+        param_modes << (ins / 100) % 10
+        param_modes << (ins / 1000) % 10
+        param_modes << (ins / 10000) % 10
 
-      param_modes << (ins / 100) % 10
-      param_modes << (ins / 1000) % 10
-      param_modes << (ins / 10000) % 10
+        result = OPCODES[opcode].execute(memory, ip, param_modes, input_queue, output_queue)
 
-      result = OPCODES[opcode].execute(memory, ip, param_modes, input, output)
+        ip = result[0]
+      end
 
-      ip = result[0]
+      # input_queue.close  if input_queue
+      # output_queue.close if output_queue
     end
-
-    output
   end
 end
 
